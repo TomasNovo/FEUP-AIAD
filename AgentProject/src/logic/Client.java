@@ -3,19 +3,23 @@ package logic;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 
-public class MyAgent extends Agent
+public class Client extends Agent
 {
+	int id = 0;
+	
+	String[] files;
+	
 	@Override
 	protected void setup()
 	{
 		super.setup();
 		
-		addBehaviour(new WorkingBehaviour());
+		addBehaviour(new OfferProjectBehaviour());
 		
 		System.out.println("Ola!");
 	}
 	
-	class WorkingBehaviour extends Behaviour
+	class OfferProjectBehaviour extends Behaviour
 	{
 		int iterationCounter = 0;
 		
