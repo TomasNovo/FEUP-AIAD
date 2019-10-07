@@ -1,1 +1,1 @@
-http://LAPTOP-A57DIKQK:7778/acc
+http://FEUP-B303D23.campus.up.pt:7778/acc
