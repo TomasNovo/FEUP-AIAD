@@ -18,19 +18,18 @@ public class Client extends Agent
 	ArrayList<CompilationFile> files;
 	String projectPath;
 	
-	public Client(String path)
-	{
-		projectPath = path;
-	}
-	
 	@Override
 	protected void setup()
 	{
 		super.setup();
+
+		Object[] args = getArguments();
 		
-		addBehaviour(new OfferProjectBehaviour());
+//		System.out.println(System.getProperty("user.dir"));
+
+		addBehaviour(new ReadProject((String)args[0]));
 		
-		System.out.println("Ola!");
+		System.out.println("Hey! Its me, " + getAID().getName());
 	}
 	
 	class OfferProjectBehaviour extends Behaviour
@@ -80,10 +79,14 @@ public class Client extends Agent
 	            }
 
 	        }
-	        
 	        catch (IOException e) 
 	        {
 	            e.printStackTrace();
+	        }
+	        
+	        for (int i = 0; i < files.size(); i++)
+	        {
+	        	files.get(i).compile();
 	        }
 	        
 	        block();

@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class CompilationFile
 {
@@ -26,10 +29,11 @@ public class CompilationFile
 			filename = file.getName();
 			
     		BufferedReader in = new BufferedReader(new FileReader(file));
-			String line = "";
+    		text = "";
+			String line;
 			
 			while ((line = in.readLine()) != null)
-				text += line;
+				text += line + System.lineSeparator();
 			
 			in.close();
 			
@@ -48,7 +52,7 @@ public class CompilationFile
 	}
 	
 	
-	public double Compile()
+	public void compile()
 	{	
 		long start = System.nanoTime();
 		double time = -1;
@@ -56,25 +60,45 @@ public class CompilationFile
 		Process process;
 		try
 		{
-			process = Runtime.getRuntime().exec("g++ -c " + path + filename);
+			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
+			String folder = path.substring(0, path.lastIndexOf(File.separator) + 1);
+			String binaryPath = folder + filenameNoExtention + ".o";
+			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + path + "\"";
+			
+			process = Runtime.getRuntime().exec(command);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 			
 			while (process.isAlive())
+			{}
 			
-			if (process.exitValue() == 0)
-				time = (start - System.nanoTime()) / (double)10E9;
-			else
-				time = -1;
+			
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				System.err.println(line);
+			}
+			
+			int returnValue = process.exitValue();
+			
+			time = (System.nanoTime() - start) / (double)1E9;
 
+			if (returnValue != 0)
+			{
+				time = -1;
+				return;
+			}
+			
+			binary = Files.readAllBytes(Paths.get(binaryPath));
+			
+			int a = 0;
+				
 		}
 		catch (IOException e)
 		{
 			time = -1;
 			e.printStackTrace();
 		}
-		
-		return time;
 	}
 	
 }
