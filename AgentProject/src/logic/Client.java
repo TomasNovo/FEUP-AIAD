@@ -1,7 +1,9 @@
 package logic;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.lang.acl.ACLMessage;
 
 public class Client extends Agent
 {
@@ -21,18 +23,25 @@ public class Client extends Agent
 	
 	class OfferProjectBehaviour extends Behaviour
 	{
-		int iterationCounter = 0;
+		boolean sent = false;
 		
 		@Override
 		public void action()
 		{
-			System.out.println(++iterationCounter);
+//			System.out.println(++iterationCounter);
+			
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.setContent("Send");
+			msg.addReceiver(new AID("CPU", AID.ISLOCALNAME));
+			send(msg);
+			sent = true;
+
 		}
 
 		@Override
 		public boolean done()
 		{
-			return (iterationCounter == 15);
+			return sent;
 		}
 		
 	}
