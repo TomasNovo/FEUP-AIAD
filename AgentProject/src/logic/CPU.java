@@ -1,5 +1,7 @@
 package logic;
 
+import java.io.File;
+
 import javax.swing.JOptionPane;
 
 import jade.core.Agent;
@@ -8,10 +10,18 @@ import jade.lang.acl.ACLMessage;
 
 public class CPU extends Agent
 {
+	boolean receivedProjects;
+	String client;
+	String clientName;
+	String clientIP;
+	boolean clientFolder;
+	
 	@Override
 	protected void setup()
 	{
 		super.setup();
+		
+		receivedProjects = new File("../AgentProject/CPU-Projects").mkdirs();
 		
 		addBehaviour(new CompilingBehaviour(null));
 		
@@ -52,7 +62,17 @@ public class CPU extends Agent
 			ACLMessage msg = receive();
 			
 			if(msg != null)
+			{
+				String info = msg.getContent();
+				
+				clientName = info.substring(0, info.indexOf('@'));
+				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
+				
+				clientFolder = new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
+				
 				JOptionPane.showMessageDialog(null, msg.getContent());
+				
+			}
 			else block();
 		}
 

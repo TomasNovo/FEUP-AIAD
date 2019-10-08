@@ -27,14 +27,16 @@ public class Client extends Agent
 		
 //		System.out.println(System.getProperty("user.dir"));
 
-		addBehaviour(new ReadProject((String)args[0]));
+		//addBehaviour(new ReadProject((String)args[0]));
+		
+		addBehaviour(new OfferProjectBehaviour());
 		
 		System.out.println("Hey! Its me, " + getAID().getName());
 	}
 	
 	class OfferProjectBehaviour extends Behaviour
 	{
-		boolean sent = false;
+		boolean sentClient = false;
 		
 		@Override
 		public void action()
@@ -42,17 +44,17 @@ public class Client extends Agent
 //			System.out.println(++iterationCounter);
 			
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.setContent("Send");
+			msg.setContent(getAID().getName());
 			msg.addReceiver(new AID("CPU", AID.ISLOCALNAME));
 			send(msg);
-			sent = true;
+			sentClient = true;
 
 		}
 
 		@Override
 		public boolean done()
 		{
-			return sent;
+			return sentClient;
 		}
 		
 	}
