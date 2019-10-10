@@ -9,6 +9,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -59,39 +60,10 @@ public class CPU extends Agent
 			
 		}
 		
-		public int saveFile(String cn)
+		
+		public boolean createClientFolder()
 		{
-			String path = "CPU-Projects/";
-			path += cn;
-			
-			File newFile = new File(path);
-			
-			try {
-				if(newFile.createNewFile())
-				{
-					newFile.mkdir();
-				    System.out.println("File created");
-				} else {
-				    System.out.println("File already exists.");
-				}
-			} catch (IOException e) {
-				System.out.println("ERROR: CPU: Error creating file to save");
-				e.printStackTrace();
-				return -1;
-			}
-			
-			try (FileOutputStream stream = new FileOutputStream(path)) {
-			    stream.write(fileContent);
-			} catch (FileNotFoundException e) {
-				System.out.println("ERROR: CPU: Error writing to new file");
-				e.printStackTrace();
-				return -1;
-			} catch (IOException e) {
-				System.out.println("ERROR: CPU: Error writing to new file");
-				e.printStackTrace();
-				return -1;
-			}
-			return 0;
+			return new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
 		}
 		
 		public int receiveFile()
@@ -103,16 +75,31 @@ public class CPU extends Agent
 				//System.out.println(i);
 				msg = receive();
 			}
-			if (msg != null) 
-			{
-			  String filename = msg.getUserDefinedParameter("filename");
-			  f = new File(filename);// create file called fileName
-			  fileContent = msg.getByteSequenceContent();
-
-			  return 0;
-			}
-			else return -1;
 			
+
+			String filename = msg.getUserDefinedParameter("filename");
+			f = new File("CPU-Projects" + File.separator + clientName + File.separator + filename);
+		 
+			try
+			{
+				if (f.exists())
+					f.delete();
+
+				f.createNewFile();
+
+				fileContent = msg.getByteSequenceContent();
+				
+				Files.write(f.toPath(), fileContent, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return -1;
+			}
+			
+			  
+			return 0;
 		}
 		
 		public int receiveClientAID()
@@ -134,7 +121,7 @@ public class CPU extends Agent
 				System.out.println("Clientname: " + clientName);
 				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
 				
-				clientFolder = new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
+				createClientFolder();
 				
 				System.out.println(msg.getContent());
 				
@@ -151,7 +138,6 @@ public class CPU extends Agent
 		{			
 			if(receiveClientAID() != 0) {System.out.println("ERROR: CPU: Error receiving AID"); block();}
 			if(receiveFile() != 0) {System.out.println("ERROR: CPU: Error receiving file"); return;}
-			//if(saveFile(this.clientName) != 0) {System.out.println("ERROR: CPU: Error saving file"); return;}	
 			block();
 		}
 

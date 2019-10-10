@@ -32,7 +32,7 @@ public class Client extends Agent
 
 		//addBehaviour(new ReadProject((String)args[0]));
 		
-		addBehaviour(new OfferProjectBehaviour("../AgentProject/project/main.cpp"));
+		addBehaviour(new OfferProjectBehaviour("project" + File.separator + "main.cpp"));
 		
 		System.out.println("Hey! Its me, " + getAID().getName());
 	}
@@ -40,11 +40,13 @@ public class Client extends Agent
 	class OfferProjectBehaviour extends Behaviour
 	{
 		boolean sentClient = false;
-		String filename = "";
+		String filepath;
+		String filename;
 		
 		public OfferProjectBehaviour(String f)
 		{
-			this.filename = f;
+			this.filepath = f;
+			this.filename = filepath.substring(filepath.lastIndexOf(File.separator) + 1);
 		}
 		
 		@Override
@@ -52,10 +54,8 @@ public class Client extends Agent
 		{
 			sendClientAID();
 			
-			if(sendFileToCompile(this.filename) != 0)
-				return;
-				
-			sentClient = true;
+			if (sendFileToCompile() == 0)
+				sentClient = true;
 			
 			block();
 		}
@@ -68,9 +68,9 @@ public class Client extends Agent
 			send(msg);
 		}
 		
-		public int sendFileToCompile(String filename)
+		public int sendFileToCompile()
 		{
-			File f = new File(filename);
+			File f = new File(filepath);
 			byte[] fileContent = null;
 			
 			if(!f.exists())
@@ -97,7 +97,7 @@ public class Client extends Agent
 			msg.addUserDefinedParameter("filename", filename);
 			send(msg);
 			
-			return 0;	
+			return 0;
 		}
 		
 		@Override
