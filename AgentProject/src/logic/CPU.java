@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import logic.CompilationFile;
 
 import javax.swing.JOptionPane;
 
@@ -66,6 +67,11 @@ public class CPU extends Agent
 			return new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
 		}
 		
+		public boolean createFileFolder(String filename)
+		{
+			return new File("../AgentProject/CPU-Projects/" + clientName + File.separator + filename).mkdirs();
+		}
+		
 		public int receiveFile()
 		{
 			ACLMessage msg = null;
@@ -76,9 +82,13 @@ public class CPU extends Agent
 				msg = receive();
 			}
 			
-
+			
 			String filename = msg.getUserDefinedParameter("filename");
-			f = new File("CPU-Projects" + File.separator + clientName + File.separator + filename);
+			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
+
+			createFileFolder(filenameNoExtention);
+			
+			f = new File("CPU-Projects" + File.separator + clientName + File.separator + filenameNoExtention + File.separator + filename);
 		 
 			try
 			{
@@ -138,6 +148,10 @@ public class CPU extends Agent
 		{			
 			if(receiveClientAID() != 0) {System.out.println("ERROR: CPU: Error receiving AID"); block();}
 			if(receiveFile() != 0) {System.out.println("ERROR: CPU: Error receiving file"); return;}
+			
+			String pathToFolder = f.getPath().substring(0,f.getPath().lastIndexOf(File.separator));
+			addBehaviour(new ReadProject(pathToFolder));
+			
 			block();
 		}
 
@@ -162,23 +176,31 @@ public class CPU extends Agent
 		public void action()
 		{
 			files = new ArrayList<CompilationFile>();
-			
+
 	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path)))
 	        {
+
 	            for (Path child : dirStream)
 	            {
 	            	files.add(new CompilationFile(child.toFile()));
-	            }
-
+	            	
+	    		}
+	            
 	        }
 	        catch (IOException e) 
 	        {
 	            e.printStackTrace();
 	        }
 	        
+    		System.out.println(files.get(0).path);
+
+    		System.out.println(files.get(0).filename);
+    		
+	        
 	        for (int i = 0; i < files.size(); i++)
 	        {
 	        	files.get(i).compile();
+
 	        }
 	        
 	        block();

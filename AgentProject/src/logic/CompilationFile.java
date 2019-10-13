@@ -61,7 +61,7 @@ public class CompilationFile
 		try
 		{
 			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
-			String folder = path.substring(0, path.lastIndexOf(File.separator) + 1);
+    		String folder = path.substring(0, path.lastIndexOf(File.separator) + 1);
 			String binaryPath = folder + filenameNoExtention + ".o";
 			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + path + "\"";
 			
