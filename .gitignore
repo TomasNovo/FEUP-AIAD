@@ -60,3 +60,4 @@ AgentProject/MTPs-Main-Container.txt
 AgentProject/project/*.o
 AgentProject/CPU-Projects
 AgentProject/Client-Project/*.o
+AgentProject/Client-Project/*.exe
