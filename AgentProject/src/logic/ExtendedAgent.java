@@ -1,21 +1,50 @@
 package logic;
 
 import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class ExtendedAgent extends Agent
 {
-	
-	public ACLMessage getMessage()
+	public ExtendedAgent()
 	{
-		ACLMessage msg = null;
-		for (int i = 0; msg == null; i++)
+		
+	}
+	
+	
+	public void registerDF()
+	{
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		ServiceDescription sd = new ServiceDescription();
+		
+		if (this instanceof CPU)
+			sd.setType("CPU");
+		else if (this instanceof Client)
+			sd.setType("Client");
+		else
 		{
-			//println(i);
-			msg = receive();
+			errorPrintln("Failed to get class of object ExtendedAgent");
+			return;
+		}
+				
+		String name = getLocalName();
+		sd.setName(name);
+		
+		dfd.addServices(sd);
+		
+		try
+		{
+			DFService.register(this, dfd);
+		}
+		catch (FIPAException e)
+		{
+			e.printStackTrace();
+			return;
 		}
 		
-		return msg;
 	}
 	
 	public void println(String message)

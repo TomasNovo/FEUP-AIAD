@@ -2,35 +2,34 @@ package logic;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 public class Client extends ExtendedAgent
 {
 	int id = 0;
 	ArrayList<CompilationFile> files;
+	DFAgentDescription[] CPUs;
 	String projectPath;
 	Object[] args;
+	
 	
 	
 	@Override
 	protected void setup()
 	{
 		super.setup();
-
-		this.args = getArguments();
+		registerDF();
 		
-//		println(System.getProperty("user.dir"));
-
-		//addBehaviour(new ReadProject((String)args[0]));
+		this.args = getArguments();
 		
 		addBehaviour(new OfferProjectBehaviour("project" + File.separator + "main.cpp"));
 		
@@ -52,12 +51,34 @@ public class Client extends ExtendedAgent
 		@Override
 		public void action()
 		{
+			if (!findCPUs())
+				errorPrintln("Failed to find CPUs!");
+			
 			sendClientAID();
 			
 			if (sendFileToCompile() == 0)
 				sentClient = true;
+		}
+		
+		public boolean findCPUs()
+		{
+			DFAgentDescription dfad = new DFAgentDescription();
 			
-			block();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("CPU");
+			dfad.addServices(sd);
+			
+			try
+			{
+				CPUs = DFService.search(this.myAgent, dfad);
+			}
+			catch (FIPAException e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+			
+			return true;
 		}
 
 		public void sendClientAID()

@@ -12,6 +12,7 @@ import logic.CompilationFile;
 
 import javax.swing.JOptionPane;
 
+import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -31,6 +32,7 @@ public class CPU extends ExtendedAgent
 	protected void setup()
 	{
 		super.setup();
+		registerDF();
 		
 		files = new ArrayList<CompilationFile>();
 		receivedProjects = new File("../AgentProject/CPU-Projects").mkdirs();
@@ -39,7 +41,6 @@ public class CPU extends ExtendedAgent
 		
 		println("Ola!");
 	}
-	
 
 	
 	class ReceiveProjectBehaviour extends Behaviour
@@ -54,20 +55,50 @@ public class CPU extends ExtendedAgent
 			
 		}
 		
-		
-		public boolean createClientFolder()
-		{
-			return new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
+		@Override
+		public void action()
+		{			
+			if (receiveClientAID() != 0)
+			{
+				println("Error receiving client AID");
+				return;
+			}
+			
+			if (receiveFile() != 0) 
+			{
+				errorPrintln("ERROR: CPU: Error receiving file");
+				return;
+			}
+			
+			String pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+			addBehaviour(new CompileProjectBehaviour(pathToFolder));
 		}
 		
-		public boolean createFileFolder(String filename)
+		public int receiveClientAID()
 		{
-			return new File("../AgentProject/CPU-Projects/" + clientName + File.separator + filename).mkdirs();
+			ACLMessage msg = blockingReceive();	
+			
+			if (msg != null)
+			{
+				String info = msg.getContent();
+				
+				clientName = msg.getSender().getLocalName();
+				println("Clientname: " + clientName);
+				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
+				
+				createClientFolder();
+				println(msg.getContent());
+				
+				return 0;
+			}
+				
+			errorPrintln("Failed to received message!");
+			return -1;
 		}
 		
 		public int receiveFile()
 		{
-			ACLMessage msg = getMessage();
+			ACLMessage msg = blockingReceive();
 			
 			String filename = msg.getUserDefinedParameter("filename");
 			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
@@ -94,43 +125,16 @@ public class CPU extends ExtendedAgent
 			return 0;
 		}
 		
-		public int receiveClientAID()
+		public boolean createClientFolder()
 		{
-			ACLMessage msg = getMessage();	
-			
-			if (msg != null)
-			{
-				String info = msg.getContent();
-				
-				clientName = info.substring(0, info.indexOf('@'));
-				println("Clientname: " + clientName);
-				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
-				
-				createClientFolder();
-				
-				println(msg.getContent());
-				
-//				JOptionPane.showMessageDialog(null, msg.getContent());	
-				return 0;
-			}
-			else
-				errorPrintln("Failed to received message!");
-			
-			return -1;
-			
+			return new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
 		}
 		
-		@Override
-		public void action()
-		{			
-			if(receiveClientAID() != 0) {println("Error receiving client AID"); block();}
-			if(receiveFile() != 0) {errorPrintln("ERROR: CPU: Error receiving file"); return;}
-			
-			String pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
-			addBehaviour(new CompileProjectBehaviour(pathToFolder));
-					
-			block();
-		}
+		public boolean createFileFolder(String filename)
+		{
+			return new File("../AgentProject/CPU-Projects/" + clientName + File.separator + filename).mkdirs();
+		}	
+		
 
 		@Override
 		public boolean done()
@@ -165,14 +169,38 @@ public class CPU extends ExtendedAgent
             	}
     		}
 	        
-	        println("Successfully compiled!");	        
-	        block();
+	        println("Successfully compiled!");
+	        addBehaviour(new SendCompilationFilesBehaviour());
 		}
 
 		@Override
 		public boolean done()
 		{
 			return true;
-		}		
+		}
+	}
+	
+	class SendCompilationFilesBehaviour extends Behaviour
+	{
+		@Override
+		public void action()
+		{
+			for	(int i = 0; i < files.size(); i++)
+			{
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				msg.addReceiver(new AID(clientName, AID.ISLOCALNAME));
+				msg.setByteSequenceContent(files.get(i).binary);
+				msg.addUserDefinedParameter("filename", files.get(i).filename);
+				send(msg);
+			}
+			
+		}
+
+		@Override
+		public boolean done()
+		{
+			return true;
+		}
+		
 	}
 }
