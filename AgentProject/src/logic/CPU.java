@@ -23,9 +23,7 @@ public class CPU extends ExtendedAgent
 	String projectPath;
 	
 	boolean receivedProjects;
-	String client;
-	String clientName;
-	String clientIP;
+	AID clientAID;
 	boolean clientFolder;
 	
 	@Override
@@ -45,10 +43,7 @@ public class CPU extends ExtendedAgent
 	
 	class ReceiveProjectBehaviour extends Behaviour
 	{
-		int iterationCounter = 0;
-		File f;
-		byte[] fileContent = null;
-		String clientName;
+		String pathToFolder;
 		
 		public ReceiveProjectBehaviour()
 		{
@@ -69,8 +64,7 @@ public class CPU extends ExtendedAgent
 				errorPrintln("ERROR: CPU: Error receiving file");
 				return;
 			}
-			
-			String pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+		
 			addBehaviour(new CompileProjectBehaviour(pathToFolder));
 		}
 		
@@ -82,9 +76,7 @@ public class CPU extends ExtendedAgent
 			{
 				String info = msg.getContent();
 				
-				clientName = msg.getSender().getLocalName();
-				println("Clientname: " + clientName);
-				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
+				clientAID = msg.getSender();
 				
 				createClientFolder();
 				println(msg.getContent());
@@ -105,11 +97,12 @@ public class CPU extends ExtendedAgent
 
 			createFileFolder(filenameNoExtention);
 			
-			f = new File("CPU-Projects" + File.separator + clientName + File.separator + filenameNoExtention + File.separator + filename);
-		 
+			File f = new File("CPU-Projects" + File.separator + clientAID.getLocalName() + File.separator + filenameNoExtention + File.separator + filename);
+			pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+					
 			try
 			{
-				fileContent = msg.getByteSequenceContent();
+				byte[] fileContent = msg.getByteSequenceContent();
 								
 				Files.write(f.toPath(), fileContent, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 				
@@ -127,12 +120,12 @@ public class CPU extends ExtendedAgent
 		
 		public boolean createClientFolder()
 		{
-			return new File("../AgentProject/CPU-Projects/" + clientName).mkdirs();
+			return new File("../AgentProject/CPU-Projects/" + clientAID.getLocalName()).mkdirs();
 		}
 		
 		public boolean createFileFolder(String filename)
 		{
-			return new File("../AgentProject/CPU-Projects/" + clientName + File.separator + filename).mkdirs();
+			return new File("../AgentProject/CPU-Projects/" + clientAID.getLocalName() + File.separator + filename).mkdirs();
 		}	
 		
 
@@ -188,7 +181,7 @@ public class CPU extends ExtendedAgent
 			for	(int i = 0; i < files.size(); i++)
 			{
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-				msg.addReceiver(new AID(clientName, AID.ISLOCALNAME));
+				msg.addReceiver(clientAID);
 				msg.setByteSequenceContent(files.get(i).binary);
 				msg.addUserDefinedParameter("filename", files.get(i).filename);
 				send(msg);

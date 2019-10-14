@@ -85,7 +85,7 @@ public class Client extends ExtendedAgent
 		{
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.setContent(getAID().getName());
-			msg.addReceiver(new AID("CPU", AID.ISLOCALNAME));
+			msg.addReceiver(CPUs[0].getName());
 			send(msg);
 		}
 		
@@ -113,7 +113,7 @@ public class Client extends ExtendedAgent
 			
 			
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(new AID("CPU", AID.ISLOCALNAME));
+			msg.addReceiver(CPUs[0].getName());
 			msg.setByteSequenceContent(fileContent);
 			msg.addUserDefinedParameter("filename", filename);
 			send(msg);
