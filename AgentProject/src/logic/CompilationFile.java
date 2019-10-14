@@ -1,15 +1,12 @@
 package logic;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CompilationFile
@@ -55,7 +52,6 @@ public class CompilationFile
 	public void compile()
 	{	
 		long start = System.nanoTime();
-		double time = -1;
 		
 		Process process;
 		try
@@ -67,7 +63,6 @@ public class CompilationFile
 			
 			process = Runtime.getRuntime().exec(command);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 			
 			while (process.isAlive())
 			{}
@@ -81,22 +76,19 @@ public class CompilationFile
 			
 			int returnValue = process.exitValue();
 			
-			time = (System.nanoTime() - start) / (double)1E9;
+			this.compilationTime = (System.nanoTime() - start) / (double)1E9;
 
 			if (returnValue != 0)
 			{
-				time = -1;
+				this.compilationTime = -1;
 				return;
 			}
 			
-			binary = Files.readAllBytes(Paths.get(binaryPath));
-			
-			int a = 0;
-				
+			binary = Files.readAllBytes(Paths.get(binaryPath));				
 		}
 		catch (IOException e)
 		{
-			time = -1;
+			this.compilationTime = -1;
 			e.printStackTrace();
 		}
 	}

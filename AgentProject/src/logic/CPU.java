@@ -19,7 +19,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
-public class CPU extends Agent
+public class CPU extends ExtendedAgent
 {
 	int id = 0;
 	ArrayList<CompilationFile> files;
@@ -40,7 +40,19 @@ public class CPU extends Agent
 		
 		addBehaviour(new CompilingBehaviour(null));
 		
-		System.out.println("Ola! " + getAID().getName() );
+		println("Ola!");
+	}
+	
+	public ACLMessage getMessage()
+	{
+		ACLMessage msg = null;
+		for (int i = 0; msg == null; i++)
+		{
+			//println(i);
+			msg = receive();
+		}
+		
+		return msg;
 	}
 	
 	class CompilingBehaviour extends Behaviour
@@ -74,14 +86,7 @@ public class CPU extends Agent
 		
 		public int receiveFile()
 		{
-			ACLMessage msg = null;
-			
-			for (int i = 0; msg == null; i++)
-			{
-				//System.out.println(i);
-				msg = receive();
-			}
-			
+			ACLMessage msg = getMessage();
 			
 			String filename = msg.getUserDefinedParameter("filename");
 			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
@@ -114,30 +119,25 @@ public class CPU extends Agent
 		
 		public int receiveClientAID()
 		{
-			ACLMessage msg = null;
-			
-			for (int i = 0; msg == null; i++)
-			{
-				//System.out.println(i);
-				msg = receive();
-			}
-		
+			ACLMessage msg = getMessage();	
 			
 			if (msg != null)
 			{
 				String info = msg.getContent();
 				
 				clientName = info.substring(0, info.indexOf('@'));
-				System.out.println("Clientname: " + clientName);
+				println("Clientname: " + clientName);
 				clientIP = info.substring(info.indexOf('@') + 1, info.indexOf('/'));
 				
 				createClientFolder();
 				
-				System.out.println(msg.getContent());
+				println(msg.getContent());
 				
 //				JOptionPane.showMessageDialog(null, msg.getContent());	
 				return 0;
 			}
+			else
+				errorPrintln("Failed to received message!");
 			
 			return -1;
 			
@@ -146,12 +146,12 @@ public class CPU extends Agent
 		@Override
 		public void action()
 		{			
-			if(receiveClientAID() != 0) {System.out.println("ERROR: CPU: Error receiving AID"); block();}
-			if(receiveFile() != 0) {System.out.println("ERROR: CPU: Error receiving file"); return;}
+			if(receiveClientAID() != 0) {println("Error receiving client AID"); block();}
+			if(receiveFile() != 0) {errorPrintln("ERROR: CPU: Error receiving file"); return;}
 			
 			String pathToFolder = f.getPath().substring(0,f.getPath().lastIndexOf(File.separator));
 			addBehaviour(new ReadProject(pathToFolder));
-			
+					
 			block();
 		}
 
@@ -192,9 +192,9 @@ public class CPU extends Agent
 	            e.printStackTrace();
 	        }
 	        
-    		System.out.println(files.get(0).path);
+    		println(files.get(0).path);
 
-    		System.out.println(files.get(0).filename);
+    		println(files.get(0).filename);
     		
 	        
 	        for (int i = 0; i < files.size(); i++)
@@ -211,7 +211,6 @@ public class CPU extends Agent
 		public boolean done()
 		{
 			return true;
-		}
-		
+		}		
 	}
 }

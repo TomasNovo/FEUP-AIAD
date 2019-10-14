@@ -13,7 +13,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
-public class Client extends Agent
+public class Client extends ExtendedAgent
 {
 	int id = 0;
 	ArrayList<CompilationFile> files;
@@ -28,13 +28,13 @@ public class Client extends Agent
 
 		this.args = getArguments();
 		
-//		System.out.println(System.getProperty("user.dir"));
+//		println(System.getProperty("user.dir"));
 
 		//addBehaviour(new ReadProject((String)args[0]));
 		
 		addBehaviour(new OfferProjectBehaviour("project" + File.separator + "main.cpp"));
 		
-		System.out.println("Hey! Its me, " + getAID().getName());
+		println("Hey! Its me, " + getAID().getName());
 	}
 	
 	class OfferProjectBehaviour extends Behaviour
@@ -75,7 +75,7 @@ public class Client extends Agent
 			
 			if(!f.exists())
 			{
-				System.out.println("ERROR: Client: Inexistent file, please enter a valid path !" );
+				println("ERROR: Client: Inexistent file, please enter a valid path !" );
 				return -1;
 			}
 			
@@ -85,7 +85,7 @@ public class Client extends Agent
 			} 
 			catch (IOException e) 
 			{
-				System.out.println("ERROR: Client: Error sending file" );
+				println("ERROR: Client: Error sending file" );
 				e.printStackTrace();
 				return -1;
 			}
