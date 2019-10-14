@@ -120,12 +120,12 @@ public class CPU extends ExtendedAgent
 		
 		public boolean createClientFolder()
 		{
-			return new File("../AgentProject/CPU-Projects/" + clientAID.getLocalName()).mkdirs();
+			return new File("CPU-Projects/" + clientAID.getLocalName()).mkdirs();
 		}
 		
 		public boolean createFileFolder(String filename)
 		{
-			return new File("../AgentProject/CPU-Projects/" + clientAID.getLocalName() + File.separator + filename).mkdirs();
+			return new File("CPU-Projects/" + clientAID.getLocalName() + File.separator + filename).mkdirs();
 		}	
 		
 

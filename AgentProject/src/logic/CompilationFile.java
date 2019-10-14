@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class CompilationFile
 {
 	String path;
 	String filename;
+	String filenameNoExtention;
 	String text;
 	byte[] binary;
 	int size;
@@ -29,6 +31,7 @@ public class CompilationFile
 		{
     		path = file.getAbsolutePath();
 			filename = file.getName();
+			filenameNoExtention = filename.substring(0, filename.indexOf('.'));
 			
     		BufferedReader in = new BufferedReader(new FileReader(file));
     		text = "";
@@ -61,9 +64,8 @@ public class CompilationFile
 		Process process;
 		try
 		{
-			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
     		String folder = path.substring(0, path.lastIndexOf(File.separator) + 1);
-			String binaryPath = folder + filenameNoExtention + ".o";
+			String binaryPath = folder + filenameNoExtention + Macros.binaryFileExtension;
 			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + path + "\"";
 			
 			process = Runtime.getRuntime().exec(command);
@@ -89,12 +91,27 @@ public class CompilationFile
 				return false;
 			}
 			
-			binary = Files.readAllBytes(Paths.get(binaryPath));				
+			binary = Files.readAllBytes(Paths.get(binaryPath));			
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 			this.compilationTime = -1;
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean saveBinary()
+	{
+		try
+		{
+			Files.write(Paths.get("Client-Project/" + filenameNoExtention + Macros.binaryFileExtension), binary, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 			return false;
 		}
 		

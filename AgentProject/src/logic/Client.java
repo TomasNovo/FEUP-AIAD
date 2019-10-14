@@ -2,7 +2,10 @@ package logic;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import jade.core.AID;
@@ -12,6 +15,8 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+
+import logic.Macros;
 
 public class Client extends ExtendedAgent
 {
@@ -31,7 +36,7 @@ public class Client extends ExtendedAgent
 		
 		this.args = getArguments();
 		
-		addBehaviour(new OfferProjectBehaviour("project" + File.separator + "main.cpp"));
+		addBehaviour(new OfferProjectBehaviour("Client-Project/"));
 		
 		println("Hey! Its me, " + getAID().getName());
 	}
@@ -40,12 +45,10 @@ public class Client extends ExtendedAgent
 	{
 		boolean sentClient = false;
 		String filepath;
-		String filename;
 		
 		public OfferProjectBehaviour(String f)
 		{
 			this.filepath = f;
-			this.filename = filepath.substring(filepath.lastIndexOf(File.separator) + 1);
 		}
 		
 		@Override
@@ -56,8 +59,10 @@ public class Client extends ExtendedAgent
 			
 			sendClientAID();
 			
-			if (sendFileToCompile() == 0)
+			if (sendFileToCompile())
 				sentClient = true;
+			
+			addBehaviour(new ReceiveCompilationFilesBehaviour());
 		}
 		
 		public boolean findCPUs()
@@ -89,36 +94,39 @@ public class Client extends ExtendedAgent
 			send(msg);
 		}
 		
-		public int sendFileToCompile()
+		public boolean sendFileToCompile()
 		{
-			File f = new File(filepath);
-			byte[] fileContent = null;
+			files = new ArrayList<CompilationFile>();
 			
-			if(!f.exists())
+	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
+	        {
+	            for (Path child : dirStream)
+	            {
+	            	if (child.toFile().getName().contains(Macros.codeFileExtension))
+	            		files.add(new CompilationFile(child.toFile()));
+	    		}
+	            
+	        }
+			catch (IOException e)
 			{
-				println("ERROR: Client: Inexistent file, please enter a valid path !" );
-				return -1;
-			}
-			
-			try 
-			{
-				fileContent = Files.readAllBytes(f.toPath());
-			} 
-			catch (IOException e) 
-			{
-				println("ERROR: Client: Error sending file" );
 				e.printStackTrace();
-				return -1;
+				return false;
 			}
 			
+	        byte[] fileContent = null;
 			
-			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(CPUs[0].getName());
-			msg.setByteSequenceContent(fileContent);
-			msg.addUserDefinedParameter("filename", filename);
-			send(msg);
+			for (int i = 0; i < files.size(); i++)
+			{
+				CompilationFile cf = files.get(i);
+				
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				msg.addReceiver(CPUs[0].getName());
+				msg.setByteSequenceContent(cf.text.getBytes());
+				msg.addUserDefinedParameter("filename", cf.filename);
+				send(msg);
+			}
 			
-			return 0;
+			return true;
 		}
 		
 		@Override
@@ -128,5 +136,57 @@ public class Client extends ExtendedAgent
 		}
 		
 	}
+	
+	class ReceiveCompilationFilesBehaviour extends Behaviour
+	{
+		@Override
+		public void action()
+		{
+			for	(int i = 0; i < files.size(); i++) // Iterates through every file to receive the binary
+			{
+				ACLMessage msg = blockingReceive();
+				String filename = msg.getUserDefinedParameter("filename");
+				
+				boolean found = false;
+				
+				for	(int j = 0; j < files.size(); j++)
+				{
+					if (files.get(j).filename.equals(filename)) // Sets the binary to the respective CompilationFile
+					{
+						CompilationFile cf = files.get(i);
+						cf.binary = msg.getByteSequenceContent();
+						files.set(j, cf);
+						
+						if (!cf.saveBinary())
+						{
+							errorPrintln("Failed to save binary!");
+							return;
+						}
+						
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found)
+				{
+					errorPrintln("Failed to find respective CompilationFile!");
+					return;
+				}
+			}
+			
+			println("Successfully received compilation files");
+			
+		}
+		
+
+		@Override
+		public boolean done()
+		{
+			return true;
+		}
+		
+	}
+
 	
 }
