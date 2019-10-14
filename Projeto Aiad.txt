@@ -20,6 +20,8 @@ Competição:
 	       podem competir havendo alguns CPU'S que escolham ficheiros 
                que demorem menos a compilar ou terminem mais proximos de
 	       outros CPU's também terminarem as suas compilações 
+
+Anexo: Os clientes oferecem o projeto com um deadline e os CPUs podem estimar o deadline da compilação dos ficheiros atribuidos a si e tentar colaborar entre eles para manter o deadline pior entre eles abaixo do deadline do projeto (atribuido pelo cliente).
 		
 
 Notas:
