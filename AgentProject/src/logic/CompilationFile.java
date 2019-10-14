@@ -18,6 +18,11 @@ public class CompilationFile
 	int size;
 	double compilationTime;
 	
+	public CompilationFile()
+	{
+		
+	}
+	
 	public CompilationFile(File file)
 	{
         try
@@ -49,7 +54,7 @@ public class CompilationFile
 	}
 	
 	
-	public void compile()
+	public boolean compile()
 	{	
 		long start = System.nanoTime();
 		
@@ -81,16 +86,19 @@ public class CompilationFile
 			if (returnValue != 0)
 			{
 				this.compilationTime = -1;
-				return;
+				return false;
 			}
 			
 			binary = Files.readAllBytes(Paths.get(binaryPath));				
 		}
 		catch (IOException e)
 		{
-			this.compilationTime = -1;
 			e.printStackTrace();
+			this.compilationTime = -1;
+			return false;
 		}
+		
+		return true;
 	}
 	
 }

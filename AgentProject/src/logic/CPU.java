@@ -1,9 +1,6 @@
 package logic;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -15,7 +12,6 @@ import logic.CompilationFile;
 
 import javax.swing.JOptionPane;
 
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -36,40 +32,25 @@ public class CPU extends ExtendedAgent
 	{
 		super.setup();
 		
+		files = new ArrayList<CompilationFile>();
 		receivedProjects = new File("../AgentProject/CPU-Projects").mkdirs();
 		
-		addBehaviour(new CompilingBehaviour(null));
+		addBehaviour(new ReceiveProjectBehaviour());
 		
 		println("Ola!");
 	}
 	
-	public ACLMessage getMessage()
-	{
-		ACLMessage msg = null;
-		for (int i = 0; msg == null; i++)
-		{
-			//println(i);
-			msg = receive();
-		}
-		
-		return msg;
-	}
+
 	
-	class CompilingBehaviour extends Behaviour
+	class ReceiveProjectBehaviour extends Behaviour
 	{
 		int iterationCounter = 0;
 		File f;
 		byte[] fileContent = null;
 		String clientName;
 		
-		String[] files;
-		
-		public CompilingBehaviour(String[] files)
+		public ReceiveProjectBehaviour()
 		{
-			if (files == null)
-				this.files = new String[0];
-			else
-				this.files = files;
 			
 		}
 		
@@ -97,18 +78,14 @@ public class CPU extends ExtendedAgent
 		 
 			try
 			{
-				if (f.exists())
-					f.delete();
-
-				f.createNewFile();
-
 				fileContent = msg.getByteSequenceContent();
-				
+								
 				Files.write(f.toPath(), fileContent, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+				
+				files.add(new CompilationFile(f));
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return -1;
 			}
@@ -149,8 +126,8 @@ public class CPU extends ExtendedAgent
 			if(receiveClientAID() != 0) {println("Error receiving client AID"); block();}
 			if(receiveFile() != 0) {errorPrintln("ERROR: CPU: Error receiving file"); return;}
 			
-			String pathToFolder = f.getPath().substring(0,f.getPath().lastIndexOf(File.separator));
-			addBehaviour(new ReadProject(pathToFolder));
+			String pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+			addBehaviour(new CompileProjectBehaviour(pathToFolder));
 					
 			block();
 		}
@@ -163,11 +140,11 @@ public class CPU extends ExtendedAgent
 		
 	}
 	
-	class ReadProject extends Behaviour
+	class CompileProjectBehaviour extends Behaviour
 	{
 		String path;
 	
-		public ReadProject(String path)
+		public CompileProjectBehaviour(String path)
 		{
 			this.path = path;
 		}
@@ -175,36 +152,21 @@ public class CPU extends ExtendedAgent
 		@Override
 		public void action()
 		{
-			files = new ArrayList<CompilationFile>();
+			CompilationFile cf = null;
 
-	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(path)))
-	        {
-
-	            for (Path child : dirStream)
-	            {
-	            	files.add(new CompilationFile(child.toFile()));
-	            	
-	    		}
-	            
-	        }
-	        catch (IOException e) 
-	        {
-	            e.printStackTrace();
-	        }
+            for (int i = 0; i < files.size(); i++)
+            {
+            	cf = files.get(i);
+            	
+            	if (!cf.compile())
+            	{
+            		errorPrintln("Failed to compile " + cf.filename);
+            		return;
+            	}
+    		}
 	        
-    		println(files.get(0).path);
-
-    		println(files.get(0).filename);
-    		
-	        
-	        for (int i = 0; i < files.size(); i++)
-	        {
-	        	files.get(i).compile();
-
-	        }
-	        
+	        println("Successfully compiled!");	        
 	        block();
-
 		}
 
 		@Override
