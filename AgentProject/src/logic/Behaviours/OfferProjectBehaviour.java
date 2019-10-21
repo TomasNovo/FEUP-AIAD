@@ -19,16 +19,16 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.Behaviours.ReceiveCompilationFilesBehaviour;
 
-class OfferProjectBehaviour extends Behaviour
+public class OfferProjectBehaviour extends Behaviour
 {
-	ArrayList<CompilationFile> files;
-	DFAgentDescription[] CPUs;
+	Client agent;
 	
 	boolean sentClient = false;
 	String filepath;
 	
 	public OfferProjectBehaviour(String f)
 	{
+		agent = (Client) myAgent;
 		this.filepath = f;
 	}
 	
@@ -37,15 +37,7 @@ class OfferProjectBehaviour extends Behaviour
 	{
 		publishProject();
 		
-//		if (!findCPUs())
-//			errorPrintln("Failed to find CPUs!");
-//		
-//		sendClientAID();
-//		
-//		if (sendFileToCompile())
-//			sentClient = true;
-		
-		((Client) this.myAgent).addBehaviour(new ReceiveCompilationFilesBehaviour(files));
+		((Client) this.myAgent).addBehaviour(new ReceiveCompilationFilesBehaviour());
 	}
 	
 	public boolean publishProject()
@@ -63,7 +55,7 @@ class OfferProjectBehaviour extends Behaviour
             	if (child.toFile().getName().contains(Macros.codeFileExtension))
             	{
             		CompilationFile cf = new CompilationFile(child.toFile());
-            		files.add(cf);
+            		agent.files.add(cf);
             		
             		Property p = new Property();
             		
@@ -97,7 +89,7 @@ class OfferProjectBehaviour extends Behaviour
 		
 		try
 		{
-			CPUs = DFService.search(this.myAgent, dfad);
+			agent.CPUs = DFService.search(this.myAgent, dfad);
 		}
 		catch (FIPAException e)
 		{
@@ -112,20 +104,20 @@ class OfferProjectBehaviour extends Behaviour
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent(((Client) this.myAgent).getAID().getName());
-		msg.addReceiver(CPUs[0].getName());
+		msg.addReceiver(agent.CPUs[0].getName());
 		((Client) this.myAgent).send(msg);
 	}
 	
 	public boolean sendFileToCompile()
 	{
-		files = new ArrayList<CompilationFile>();
+		agent.files = new ArrayList<CompilationFile>();
 		
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
         {
             for (Path child : dirStream)
             {
             	if (child.toFile().getName().contains(Macros.codeFileExtension))
-            		files.add(new CompilationFile(child.toFile()));
+            		agent.files.add(new CompilationFile(child.toFile()));
     		}
             
         }
@@ -137,12 +129,12 @@ class OfferProjectBehaviour extends Behaviour
 		
         byte[] fileContent = null;
 		
-		for (int i = 0; i < files.size(); i++)
+		for (int i = 0; i < agent.files.size(); i++)
 		{
-			CompilationFile cf = files.get(i);
+			CompilationFile cf = agent.files.get(i);
 			
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(CPUs[0].getName());
+			msg.addReceiver(agent.CPUs[0].getName());
 			msg.setByteSequenceContent(cf.getText().getBytes());
 			msg.addUserDefinedParameter("filename", cf.getFilename());
 			((Client) this.myAgent).send(msg);

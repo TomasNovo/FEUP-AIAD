@@ -7,32 +7,32 @@ import jade.lang.acl.ACLMessage;
 import logic.Client;
 import logic.CompilationFile;
 
-class ReceiveCompilationFilesBehaviour extends Behaviour
+public class ReceiveCompilationFilesBehaviour extends Behaviour
 {
-	ArrayList<CompilationFile> files;
+	Client agent;
 	
-	public ReceiveCompilationFilesBehaviour(ArrayList<CompilationFile> f)
+	public ReceiveCompilationFilesBehaviour()
 	{
-		files = f;
+		agent = (Client) myAgent;
 	}
 	
 	@Override
 	public void action()
 	{
-		for	(int i = 0; i < files.size(); i++) // Iterates through every file to receive the binary
+		for	(int i = 0; i < agent.files.size(); i++) // Iterates through every file to receive the binary
 		{
 			ACLMessage msg = this.myAgent.blockingReceive();
 			String filename = msg.getUserDefinedParameter("filename");
 			
 			boolean found = false;
 			
-			for	(int j = 0; j < files.size(); j++)
+			for	(int j = 0; j < agent.files.size(); j++)
 			{
-				if (files.get(j).getFilename().equals(filename)) // Sets the binary to the respective CompilationFile
+				if (agent.files.get(j).getFilename().equals(filename)) // Sets the binary to the respective CompilationFile
 				{
-					CompilationFile cf = files.get(i);
+					CompilationFile cf = agent.files.get(i);
 					cf.setBinary(msg.getByteSequenceContent());
-					files.set(j, cf);
+					agent.files.set(j, cf);
 					
 					if (!cf.saveBinary())
 					{
