@@ -90,10 +90,6 @@ public class Client extends ExtendedAgent
     		Property p = new Property(); // Sets project deadline
     		p.setName("dealine");
     		p.setValue(new Integer(b.getDeadlineInSeconds()));
-    		
-    		p = new Property(); // Sets the project name
-    		p.setName("name");
-    		p.setValue(filepath);
 			
 	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
 	        {
