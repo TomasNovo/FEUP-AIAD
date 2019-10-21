@@ -14,12 +14,16 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import logic.Client;
 import logic.CompilationFile;
 import logic.Macros;
-import logic.Client.ReceiveCompilationFilesBehaviour;
+import logic.Behaviours.ReceiveCompilationFilesBehaviour;
 
 class OfferProjectBehaviour extends Behaviour
 {
+	ArrayList<CompilationFile> files;
+	DFAgentDescription[] CPUs;
+	
 	boolean sentClient = false;
 	String filepath;
 	
@@ -41,7 +45,7 @@ class OfferProjectBehaviour extends Behaviour
 //		if (sendFileToCompile())
 //			sentClient = true;
 		
-		addBehaviour(new ReceiveCompilationFilesBehaviour());
+		((Client) this.myAgent).addBehaviour(new ReceiveCompilationFilesBehaviour(files));
 	}
 	
 	public boolean publishProject()
@@ -63,7 +67,7 @@ class OfferProjectBehaviour extends Behaviour
             		
             		Property p = new Property();
             		
-            		p.setName(cf.filename);
+            		p.setName(cf.getFilename());
             		p.setValue(cf);
             		
             		sd.addProperties(p);
@@ -107,9 +111,9 @@ class OfferProjectBehaviour extends Behaviour
 	public void sendClientAID()
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent(getAID().getName());
+		msg.setContent(((Client) this.myAgent).getAID().getName());
 		msg.addReceiver(CPUs[0].getName());
-		send(msg);
+		((Client) this.myAgent).send(msg);
 	}
 	
 	public boolean sendFileToCompile()
@@ -139,9 +143,9 @@ class OfferProjectBehaviour extends Behaviour
 			
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.addReceiver(CPUs[0].getName());
-			msg.setByteSequenceContent(cf.text.getBytes());
-			msg.addUserDefinedParameter("filename", cf.filename);
-			send(msg);
+			msg.setByteSequenceContent(cf.getText().getBytes());
+			msg.addUserDefinedParameter("filename", cf.getFilename());
+			((Client) this.myAgent).send(msg);
 		}
 		
 		return true;
