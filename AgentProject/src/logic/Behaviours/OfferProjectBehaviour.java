@@ -17,27 +17,29 @@ import jade.lang.acl.ACLMessage;
 import logic.Client;
 import logic.CompilationFile;
 import logic.Macros;
-import logic.Behaviours.ReceiveCompilationFilesBehaviour;
+import logic.Behaviours.ReceiveCompiledFilesBehaviour;;
 
 public class OfferProjectBehaviour extends Behaviour
 {
 	Client agent;
 	
 	boolean sentClient = false;
-	String filepath;
+	String projectPath;
 	
 	public OfferProjectBehaviour(String f)
 	{
-		agent = (Client) myAgent;
-		this.filepath = f;
+		this.projectPath = f;
 	}
 	
 	@Override
 	public void action()
 	{
+		agent = (Client) myAgent;
+		agent.files = new ArrayList<CompilationFile>();
+		
 		publishProject();
 		
-		((Client) this.myAgent).addBehaviour(new ReceiveCompilationFilesBehaviour());
+		agent.addBehaviour(new ReceiveCompiledFilesBehaviour());
 	}
 	
 	public boolean publishProject()
@@ -45,10 +47,13 @@ public class OfferProjectBehaviour extends Behaviour
 		DFAgentDescription dfad = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
 		
-		sd.setName(filepath);
+		sd.setName(projectPath);
 		sd.setType("project");
 		
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
+		Property p = new Property("deadline", new Integer(agent.b.getDeadlineInSeconds()).toString()); // Sets project deadline
+		sd.addProperties(p);
+		
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(Macros.clientProjectPath + "/" + projectPath)))
         {
             for (Path child : dirStream)
             {
@@ -57,17 +62,13 @@ public class OfferProjectBehaviour extends Behaviour
             		CompilationFile cf = new CompilationFile(child.toFile());
             		agent.files.add(cf);
             		
-            		Property p = new Property();
-            		
-            		p.setName(cf.getFilename());
-            		p.setValue(cf);
-            		
+            		p = new Property("file", cf.serialize());
             		sd.addProperties(p);
             	}
     		}
             
 			dfad.addServices(sd);
-			DFService.modify(this.myAgent, this.myAgent.getAID(), dfad);
+			DFService.modify(this.myAgent, dfad);
             
         }
 		catch (IOException | FIPAException e)
@@ -103,16 +104,16 @@ public class OfferProjectBehaviour extends Behaviour
 	public void sendClientAID()
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent(((Client) this.myAgent).getAID().getName());
+		msg.setContent(agent.getAID().getName());
 		msg.addReceiver(agent.CPUs[0].getName());
-		((Client) this.myAgent).send(msg);
+		agent.send(msg);
 	}
 	
 	public boolean sendFileToCompile()
 	{
 		agent.files = new ArrayList<CompilationFile>();
 		
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(projectPath)))
         {
             for (Path child : dirStream)
             {
@@ -137,7 +138,7 @@ public class OfferProjectBehaviour extends Behaviour
 			msg.addReceiver(agent.CPUs[0].getName());
 			msg.setByteSequenceContent(cf.getText().getBytes());
 			msg.addUserDefinedParameter("filename", cf.getFilename());
-			((Client) this.myAgent).send(msg);
+			agent.send(msg);
 		}
 		
 		return true;

@@ -8,5 +8,8 @@ public class Macros
 	public static final char seconds = 's';
 	public static final char minutes = 'm';
 	public static final char hours = 'h';
+	
+	public static final String clientProjectPath = "Client-Projects";
+	public static final String cpuProjectPath = "CPU-Projects";
 
 }

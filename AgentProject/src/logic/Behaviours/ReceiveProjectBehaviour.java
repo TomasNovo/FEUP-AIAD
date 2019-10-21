@@ -7,7 +7,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -16,6 +18,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import logic.CPU;
 import logic.Client;
 import logic.CompilationFile;
+import logic.Macros;
 import logic.Behaviours.CompileProjectBehaviour;
 
 /*TODO
@@ -25,30 +28,31 @@ import logic.Behaviours.CompileProjectBehaviour;
  *  112, 133, 138 - change .clientAID to get method
  * */
 
-public class ReceiveProjectBehaviour extends Behaviour
+public class ReceiveProjectBehaviour extends TickerBehaviour
 {
-	
+	CPU agent;
 	String pathToFolder;
-	
-	public ReceiveProjectBehaviour()
+
+	public ReceiveProjectBehaviour(CPU agent)
 	{
-		((CPU) this.myAgent).files = new ArrayList<CompilationFile>();
+		super(agent, 1000);
+		
+		this.agent = agent;
 	}
 	
 	@Override
-	public void action()
+	public void onTick()
 	{
-		if (!selectProject()) 
-		{
-			((Client) this.myAgent).errorPrintln("ERROR: CPU: Error receiving file");
-			return;
-		}
-	
-		((CPU) this.myAgent).addBehaviour(new CompileProjectBehaviour(pathToFolder));
+		if (!selectProject())
+			agent.errorPrintln("ERROR: CPU: Error receiving file");
+		else
+			agent.addBehaviour(new CompileProjectBehaviour(pathToFolder));
 	}
 	
 	public boolean selectProject()
 	{
+		agent.files = new ArrayList<CompilationFile>();
+		
 		DFAgentDescription dfad = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("project");
@@ -66,32 +70,37 @@ public class ReceiveProjectBehaviour extends Behaviour
 			return false;
 		}
 		
+		if (projects.length == 0)
+			return false;
+		
 		DFAgentDescription project = null;
 		Integer deadline = null;
+		Property p;
 		
 		for (int i = 0; i < projects.length; i++) // Searches for the project with the lowest deadline
 		{
 			dfad = projects[i];
 			sd = (ServiceDescription) dfad.getAllServices().next();
-			
+						
 			for (Iterator it = sd.getAllProperties(); it.hasNext();) // Gets the deadline property of the service and saves it if it is lower than the current one
 			{
-				Property p = (Property) it.next();
-				
+				p = (Property) it.next();
+
 				if (p.getName().equals("deadline"))
 				{
 					if (project == null || (Integer)p.getValue() < deadline)
 					{
 						project = dfad;
-						deadline = (Integer)p.getValue();
+						deadline = Integer.parseInt((String)p.getValue());
 					}
+					
+					break;
 				}
-				
-				break;
 			}
 		}
 		
-		  
+		agent.clientAID = project.getName();
+		
 		return saveProject(project);
 	}
 	
@@ -99,7 +108,8 @@ public class ReceiveProjectBehaviour extends Behaviour
 	{
 		ServiceDescription sd = (ServiceDescription) project.getAllServices().next();
 		String projectName = sd.getName();
-		createFileFolder(projectName);
+		pathToFolder = Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName() + "/" + projectName;
+		createProjectFolder(new File(projectName).getName());
 		
 		for (Iterator it = sd.getAllProperties(); it.hasNext();)
 		{
@@ -107,11 +117,11 @@ public class ReceiveProjectBehaviour extends Behaviour
 			
 			if (p.getName().equals("file"))
 			{
-				CompilationFile cf = (CompilationFile) p.getValue();
-				((Client) this.myAgent).files.add(cf);
+				Object o = p.getValue();
+				CompilationFile cf = CompilationFile.deserialize((String)p.getValue());
+				agent.files.add(cf);
 				
-				File f = new File("CPU-Projects" + File.separator + ((CPU) this.myAgent).clientAID.getLocalName() + File.separator + projectName + File.separator + cf.getFilename());
-				pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+				File f = new File(pathToFolder + "/" + cf.getFilename());
 						
 				try
 				{	
@@ -131,19 +141,12 @@ public class ReceiveProjectBehaviour extends Behaviour
 	
 	public boolean createClientFolder()
 	{
-		return new File("CPU-Projects/" + ((CPU) this.myAgent).clientAID.getLocalName()).mkdirs();
+		return new File(Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName()).mkdirs();
 	}
 	
-	public boolean createFileFolder(String filename)
+	public boolean createProjectFolder(String filename)
 	{
-		return new File("CPU-Projects/" + ((CPU) this.myAgent).clientAID.getLocalName() + File.separator + filename).mkdirs();
+		return new File(Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName() + "/" + filename).mkdirs();
 	}	
-	
-
-	@Override
-	public boolean done()
-	{
-		return true;
-	}
 	
 }

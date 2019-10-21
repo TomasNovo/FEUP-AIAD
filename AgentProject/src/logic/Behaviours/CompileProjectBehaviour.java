@@ -8,6 +8,7 @@ import logic.Behaviours.SendCompilationFilesBehaviour;
 
 public class CompileProjectBehaviour extends Behaviour
 {
+	CPU agent;
 	String path;
 
 	public CompileProjectBehaviour(String path)
@@ -18,11 +19,13 @@ public class CompileProjectBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
+		agent = (CPU) myAgent;
+		
 		CompilationFile cf = null;
 
-        for (int i = 0; i < ((CPU) this.myAgent).files.size(); i++)
+        for (int i = 0; i < agent.files.size(); i++)
         {
-        	cf = ((CPU) this.myAgent).files.get(i);
+        	cf = agent.files.get(i);
         	
         	if (!cf.compile())
         	{
@@ -31,8 +34,8 @@ public class CompileProjectBehaviour extends Behaviour
         	}
 		}
         
-        ((CPU) this.myAgent).println("Successfully compiled!");
-        ((CPU) this.myAgent).addBehaviour(new SendCompilationFilesBehaviour());
+        agent.println("Successfully compiled!");
+        agent.addBehaviour(new SendCompilationFilesBehaviour());
 	}
 
 	@Override

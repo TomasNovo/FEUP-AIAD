@@ -25,7 +25,7 @@ public class CPU extends ExtendedAgent
 		
 		new File("CPU-Projects").mkdirs();
 		
-		addBehaviour(new ReceiveProjectBehaviour());
+		addBehaviour(new ReceiveProjectBehaviour(this));
 		
 		println("Ola!");
 	}

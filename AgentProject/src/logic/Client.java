@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 
+import logic.Macros;
 import logic.Auction.Bid;
-import logic.Behaviours.OfferProjectBehaviour;;
+import logic.Behaviours.OfferProjectBehaviour;
+
 
 public class Client extends ExtendedAgent
 {
