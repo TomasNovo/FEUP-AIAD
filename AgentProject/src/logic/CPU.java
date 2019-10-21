@@ -8,12 +8,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import logic.CompilationFile;
 
 import javax.swing.JOptionPane;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.Property;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 public class CPU extends ExtendedAgent
@@ -22,7 +29,6 @@ public class CPU extends ExtendedAgent
 	ArrayList<CompilationFile> files;
 	String projectPath;
 	
-	boolean receivedProjects;
 	AID clientAID;
 	boolean clientFolder;
 	
@@ -32,8 +38,7 @@ public class CPU extends ExtendedAgent
 		super.setup();
 		registerDF();
 		
-		files = new ArrayList<CompilationFile>();
-		receivedProjects = new File("../AgentProject/CPU-Projects").mkdirs();
+		new File("CPU-Projects").mkdirs();
 		
 		addBehaviour(new ReceiveProjectBehaviour());
 		
@@ -47,19 +52,13 @@ public class CPU extends ExtendedAgent
 		
 		public ReceiveProjectBehaviour()
 		{
-			
+			files = new ArrayList<CompilationFile>();
 		}
 		
 		@Override
 		public void action()
-		{			
-			if (receiveClientAID() != 0)
-			{
-				println("Error receiving client AID");
-				return;
-			}
-			
-			if (receiveFile() != 0) 
+		{
+			if (!selectProject()) 
 			{
 				errorPrintln("ERROR: CPU: Error receiving file");
 				return;
@@ -68,54 +67,86 @@ public class CPU extends ExtendedAgent
 			addBehaviour(new CompileProjectBehaviour(pathToFolder));
 		}
 		
-		public int receiveClientAID()
+		public boolean selectProject()
 		{
-			ACLMessage msg = blockingReceive();	
+			DFAgentDescription dfad = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("project");
+			dfad.addServices(sd);
 			
-			if (msg != null)
-			{
-				String info = msg.getContent();
-				
-				clientAID = msg.getSender();
-				
-				createClientFolder();
-				println(msg.getContent());
-				
-				return 0;
-			}
-				
-			errorPrintln("Failed to received message!");
-			return -1;
-		}
-		
-		public int receiveFile()
-		{
-			ACLMessage msg = blockingReceive();
+			DFAgentDescription[] projects;
 			
-			String filename = msg.getUserDefinedParameter("filename");
-			String filenameNoExtention = filename.substring(0, filename.indexOf('.'));
-
-			createFileFolder(filenameNoExtention);
-			
-			File f = new File("CPU-Projects" + File.separator + clientAID.getLocalName() + File.separator + filenameNoExtention + File.separator + filename);
-			pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
-					
 			try
 			{
-				byte[] fileContent = msg.getByteSequenceContent();
-								
-				Files.write(f.toPath(), fileContent, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-				
-				files.add(new CompilationFile(f));
+				projects = DFService.search(this.myAgent, dfad);
 			}
-			catch (IOException e)
+			catch (FIPAException e)
 			{
 				e.printStackTrace();
-				return -1;
+				return false;
+			}
+			
+			DFAgentDescription project = null;
+			Integer deadline = null;
+			
+			for (int i = 0; i < projects.length; i++) // Searches for the project with the lowest deadline
+			{
+				dfad = projects[i];
+				sd = (ServiceDescription) dfad.getAllServices().next();
+				
+				for (Iterator it = sd.getAllProperties(); it.hasNext();) // Gets the deadline property of the service and saves it if it is lower than the current one
+				{
+					Property p = (Property) it.next();
+					
+					if (p.getName().equals("deadline"))
+					{
+						if (project == null || (Integer)p.getValue() < deadline)
+						{
+							project = dfad;
+							deadline = (Integer)p.getValue();
+						}
+					}
+					
+					break;
+				}
 			}
 			
 			  
-			return 0;
+			return saveProject(project);
+		}
+		
+		public boolean saveProject(DFAgentDescription project)
+		{
+			ServiceDescription sd = (ServiceDescription) project.getAllServices().next();
+			String projectName = sd.getName();
+			createFileFolder(projectName);
+			
+			for (Iterator it = sd.getAllProperties(); it.hasNext();)
+			{
+				Property p = (Property) it.next();
+				
+				if (p.getName().equals("file"))
+				{
+					CompilationFile cf = (CompilationFile) p.getValue();
+					files.add(cf);
+					
+					File f = new File("CPU-Projects" + File.separator + clientAID.getLocalName() + File.separator + projectName + File.separator + cf.filename);
+					pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
+							
+					try
+					{	
+						Files.write(f.toPath(), cf.text.getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+						return false;
+					}
+
+				}
+			}
+
+			return true;
 		}
 		
 		public boolean createClientFolder()

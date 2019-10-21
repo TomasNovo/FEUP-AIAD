@@ -102,7 +102,7 @@ public class Client extends ExtendedAgent
 	            		
 	            		p = new Property();
 	            		
-	            		p.setName(cf.filename);
+	            		p.setName("file");
 	            		p.setValue(cf);
 	            		
 	            		sd.addProperties(p);
