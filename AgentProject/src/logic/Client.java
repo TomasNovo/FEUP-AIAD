@@ -13,10 +13,12 @@ import jade.core.behaviours.Behaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 import logic.Macros;
+import logic.Auction.Bid;
 
 public class Client extends ExtendedAgent
 {
@@ -24,9 +26,8 @@ public class Client extends ExtendedAgent
 	ArrayList<CompilationFile> files;
 	DFAgentDescription[] CPUs;
 	String projectPath;
-	Object[] args;
-	
-	
+	String deadline;
+	Bid b;
 	
 	@Override
 	protected void setup()
@@ -34,11 +35,22 @@ public class Client extends ExtendedAgent
 		super.setup();
 		registerDF();
 		
-		this.args = getArguments();
-		
-		addBehaviour(new OfferProjectBehaviour("Client-Project/"));
-		
 		println("Hey! Its me, " + getAID().getName());
+		
+		Object[] args = getArguments();
+		
+		if(args != null && args.length > 0 && args.length == 2) 
+        {
+			projectPath = args[0].toString();
+            System.out.println("ProjectPath: "+ projectPath);
+            
+            deadline = args[1].toString();
+            System.out.println("Deadline: "+ deadline);
+            
+            b = new Bid(this, deadline);
+        
+    		addBehaviour(new OfferProjectBehaviour(projectPath));
+        }
 	}
 	
 	class OfferProjectBehaviour extends Behaviour
@@ -54,15 +66,56 @@ public class Client extends ExtendedAgent
 		@Override
 		public void action()
 		{
-			if (!findCPUs())
-				errorPrintln("Failed to find CPUs!");
+			publishProject();
 			
-			sendClientAID();
-			
-			if (sendFileToCompile())
-				sentClient = true;
+//			if (!findCPUs())
+//				errorPrintln("Failed to find CPUs!");
+//			
+//			sendClientAID();
+//			
+//			if (sendFileToCompile())
+//				sentClient = true;
 			
 			addBehaviour(new ReceiveCompilationFilesBehaviour());
+		}
+		
+		public boolean publishProject()
+		{
+			DFAgentDescription dfad = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			
+			sd.setName(filepath);
+			sd.setType("project");
+			
+	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
+	        {
+	            for (Path child : dirStream)
+	            {
+	            	if (child.toFile().getName().contains(Macros.codeFileExtension))
+	            	{
+	            		CompilationFile cf = new CompilationFile(child.toFile());
+	            		files.add(cf);
+	            		
+	            		Property p = new Property();
+	            		
+	            		p.setName(cf.filename);
+	            		p.setValue(cf);
+	            		
+	            		sd.addProperties(p);
+	            	}
+	    		}
+	            
+				dfad.addServices(sd);
+				DFService.modify(this.myAgent, this.myAgent.getAID(), dfad);
+	            
+	        }
+			catch (IOException | FIPAException e)
+			{
+				e.printStackTrace();
+				return false;
+			}			
+			
+			return true;
 		}
 		
 		public boolean findCPUs()
