@@ -14,6 +14,7 @@ public class CompilationFile
 {
 	String path;
 	String filename;
+	String projectname;
 	String filenameNoExtention;
 	String text;
 	byte[] binary;
@@ -30,6 +31,7 @@ public class CompilationFile
         try
 		{
     		path = file.getAbsolutePath();
+    		projectname = file.getParentFile().getName();
 			filename = file.getName();
 			filenameNoExtention = filename.substring(0, filename.indexOf('.'));
 			
@@ -107,7 +109,7 @@ public class CompilationFile
 	{
 		try
 		{
-			Files.write(Paths.get("Client-Project/" + filenameNoExtention + Macros.binaryFileExtension), binary, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			Files.write(Paths.get("Client-Project/" + projectname + "/" + filenameNoExtention + Macros.binaryFileExtension), binary, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 		}
 		catch (IOException e)
 		{
