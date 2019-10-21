@@ -87,6 +87,14 @@ public class Client extends ExtendedAgent
 			sd.setName(filepath);
 			sd.setType("project");
 			
+    		Property p = new Property(); // Sets project deadline
+    		p.setName("dealine");
+    		p.setValue(new Integer(b.getDeadlineInSeconds()));
+    		
+    		p = new Property(); // Sets the project name
+    		p.setName("name");
+    		p.setValue(filepath);
+			
 	        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(filepath)))
 	        {
 	            for (Path child : dirStream)
@@ -96,7 +104,7 @@ public class Client extends ExtendedAgent
 	            		CompilationFile cf = new CompilationFile(child.toFile());
 	            		files.add(cf);
 	            		
-	            		Property p = new Property();
+	            		p = new Property();
 	            		
 	            		p.setName(cf.filename);
 	            		p.setValue(cf);
