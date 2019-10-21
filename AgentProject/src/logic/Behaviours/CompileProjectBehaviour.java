@@ -3,6 +3,7 @@ package logic.Behaviours;
 import jade.core.behaviours.Behaviour;
 import logic.CPU;
 import logic.CompilationFile;
+import logic.ExtendedAgent;
 import logic.Behaviours.SendCompilationFilesBehaviour;
 
 public class CompileProjectBehaviour extends Behaviour
@@ -25,7 +26,7 @@ public class CompileProjectBehaviour extends Behaviour
         	
         	if (!cf.compile())
         	{
-        		errorPrintln("Failed to compile " + cf.getFilename());
+        		((ExtendedAgent)myAgent).errorPrintln("Failed to compile " + cf.getFilename());
         		return;
         	}
 		}

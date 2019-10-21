@@ -27,6 +27,7 @@ import logic.Behaviours.CompileProjectBehaviour;
 
 public class ReceiveProjectBehaviour extends Behaviour
 {
+	
 	String pathToFolder;
 	
 	public ReceiveProjectBehaviour()
