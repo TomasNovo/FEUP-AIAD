@@ -12,14 +12,14 @@ import java.nio.file.StandardOpenOption;
 
 public class CompilationFile
 {
-	public String path;
-	public String filename;
-	public String projectname;
-	public String filenameNoExtention;
-	public String text;
-	public byte[] binary;
-	public int size;
-	public double compilationTime;
+	private String path;
+	private String filename;
+	private String projectname;
+	private String filenameNoExtention;
+	private String text;
+	private byte[] binary;
+	private int size;
+	private double compilationTime;
 	
 	public CompilationFile()
 	{
@@ -120,6 +120,12 @@ public class CompilationFile
 		return true;
 	}
 	
+	// Set methods
+	public void setBinary(byte[] b)
+	{
+		this.binary = b;
+	}
+	
 	// Get methods
 	public String getPath()
 	{
@@ -144,11 +150,6 @@ public class CompilationFile
 	public String getText()
 	{
 		return this.text;
-	}
-	
-	void setBinary(byte[] b)
-	{
-		this.binary = b;
 	}
 	
 	public byte[] getBinary()

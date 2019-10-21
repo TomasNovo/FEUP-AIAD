@@ -28,10 +28,10 @@ class ReceiveCompilationFilesBehaviour extends Behaviour
 			
 			for	(int j = 0; j < files.size(); j++)
 			{
-				if (files.get(j).filename.equals(filename)) // Sets the binary to the respective CompilationFile
+				if (files.get(j).getFilename().equals(filename)) // Sets the binary to the respective CompilationFile
 				{
 					CompilationFile cf = files.get(i);
-					cf.binary = msg.getByteSequenceContent();
+					cf.setBinary(msg.getByteSequenceContent());
 					files.set(j, cf);
 					
 					if (!cf.saveBinary())
