@@ -12,13 +12,14 @@ import java.nio.file.StandardOpenOption;
 
 public class CompilationFile
 {
-	String path;
-	String filename;
-	String filenameNoExtention;
-	String text;
-	byte[] binary;
-	int size;
-	double compilationTime;
+	public String path;
+	public String filename;
+	public String projectname;
+	public String filenameNoExtention;
+	public String text;
+	public byte[] binary;
+	public int size;
+	public double compilationTime;
 	
 	public CompilationFile()
 	{
@@ -30,6 +31,7 @@ public class CompilationFile
         try
 		{
     		path = file.getAbsolutePath();
+    		projectname = file.getParentFile().getName();
 			filename = file.getName();
 			filenameNoExtention = filename.substring(0, filename.indexOf('.'));
 			
@@ -107,7 +109,7 @@ public class CompilationFile
 	{
 		try
 		{
-			Files.write(Paths.get("Client-Project/" + filenameNoExtention + Macros.binaryFileExtension), binary, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			Files.write(Paths.get("Client-Project/" + projectname + "/" + filenameNoExtention + Macros.binaryFileExtension), binary, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 		}
 		catch (IOException e)
 		{
@@ -116,6 +118,52 @@ public class CompilationFile
 		}
 		
 		return true;
+	}
+	
+	// Get methods
+	public String getPath()
+	{
+		return this.path;
+	}
+	
+	public String getFilename()
+	{
+		return this.filename;
+	}
+	
+	public String getProjectName()
+	{
+		return this.projectname;
+	}
+	
+	public String getFilenameNoExtension()
+	{
+		return this.filename;
+	}
+	
+	public String getText()
+	{
+		return this.text;
+	}
+	
+	void setBinary(byte[] b)
+	{
+		this.binary = b;
+	}
+	
+	public byte[] getBinary()
+	{
+		return this.binary;
+	}
+	
+	public int getSize()
+	{
+		return this.size;
+	}
+	
+	public double getCompilationTime()
+	{
+		return this.compilationTime;
 	}
 	
 }

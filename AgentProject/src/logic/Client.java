@@ -180,6 +180,7 @@ public class Client extends ExtendedAgent
 				msg.addReceiver(CPUs[0].getName());
 				msg.setByteSequenceContent(cf.text.getBytes());
 				msg.addUserDefinedParameter("filename", cf.filename);
+				msg.addUserDefinedParameter("projectname", cf.projectname);
 				send(msg);
 			}
 			
