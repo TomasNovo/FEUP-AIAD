@@ -1,6 +1,7 @@
 package logic.Auction;
 
 import logic.Client;
+import logic.Macros;
 
 public class Bid {
 
@@ -45,15 +46,15 @@ public class Bid {
 		
 		switch(typeOfUnit)
 		{
-			case 'h':
+			case Macros.hours:
 				this.deadlineInSeconds = this.numberOfUnit * 3600;
 				break;
 				
-			case 'm':
+			case Macros.minutes:
 				this.deadlineInSeconds = this.numberOfUnit * 60;
 				break;
 				
-			case 's':
+			case Macros.seconds:
 				this.deadlineInSeconds = this.numberOfUnit;
 				break;
 				
