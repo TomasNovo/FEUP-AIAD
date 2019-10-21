@@ -109,7 +109,7 @@ public class ReceiveProjectBehaviour extends Behaviour
 				CompilationFile cf = (CompilationFile) p.getValue();
 				((Client) this.myAgent).files.add(cf);
 				
-				File f = new File("CPU-Projects" + File.separator + ((CPU) this.myAgent).clientAID.getLocalName() + File.separator + projectName + File.separator + cf.filename);
+				File f = new File("CPU-Projects" + File.separator + ((CPU) this.myAgent).clientAID.getLocalName() + File.separator + projectName + File.separator + cf.getFilename());
 				pathToFolder = f.getPath().substring(0, f.getPath().lastIndexOf(File.separator));
 						
 				try
