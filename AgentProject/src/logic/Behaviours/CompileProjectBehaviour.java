@@ -23,9 +23,9 @@ public class CompileProjectBehaviour extends Behaviour
 		
 		CompilationFile cf = null;
 
-        for (int i = 0; i < agent.files.size(); i++)
+        for (int i = 0; i < agent.getFiles().size(); i++)
         {
-        	cf = agent.files.get(i);
+        	cf = agent.getFiles().get(i);
         	
         	if (!cf.compile())
         	{

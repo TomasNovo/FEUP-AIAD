@@ -51,7 +51,7 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	
 	public boolean selectProject()
 	{
-		agent.files = new ArrayList<CompilationFile>();
+		agent.initializeFiles();
 		
 		DFAgentDescription dfad = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
@@ -99,7 +99,7 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 			}
 		}
 		
-		agent.clientAID = project.getName();
+		agent.setClientAID(project.getName());
 		
 		return saveProject(project);
 	}
@@ -108,7 +108,7 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	{
 		ServiceDescription sd = (ServiceDescription) project.getAllServices().next();
 		String projectName = sd.getName();
-		pathToFolder = Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName() + "/" + projectName;
+		pathToFolder = Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName() + "/" + projectName;
 		createProjectFolder(new File(projectName).getName());
 		
 		for (Iterator it = sd.getAllProperties(); it.hasNext();)
@@ -119,7 +119,7 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 			{
 				Object o = p.getValue();
 				CompilationFile cf = CompilationFile.deserialize((String)p.getValue());
-				agent.files.add(cf);
+				agent.getFiles().add(cf); 
 				
 				File f = new File(pathToFolder + "/" + cf.getFilename());
 						
@@ -141,12 +141,12 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	
 	public boolean createClientFolder()
 	{
-		return new File(Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName()).mkdirs();
+		return new File(Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName()).mkdirs();
 	}
 	
 	public boolean createProjectFolder(String filename)
 	{
-		return new File(Macros.cpuProjectPath + "/" + agent.clientAID.getLocalName() + "/" + filename).mkdirs();
+		return new File(Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName() + "/" + filename).mkdirs();
 	}	
 	
 }
