@@ -60,7 +60,7 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 		}
 		
 		agent.println("Successfully received compilation files");
-		
+		myAgent.addBehaviour(new RemoveProjectBehaviour());
 	}
 	
 	public boolean saveBinary(CompilationFile cf)

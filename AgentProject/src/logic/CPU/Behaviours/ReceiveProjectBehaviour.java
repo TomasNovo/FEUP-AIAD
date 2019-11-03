@@ -20,12 +20,6 @@ import logic.Macros;
 import logic.CPU.Behaviours.CompileProjectBehaviour;
 import logic.CPU.CPU;
 
-/*TODO
- * 
- *  ReceiveProjectBehaviour() - change .files to get method
- * 
- *  112, 133, 138 - change .clientAID to get method
- * */
 
 public class ReceiveProjectBehaviour extends TickerBehaviour
 {
@@ -35,17 +29,19 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	public ReceiveProjectBehaviour(CPU agent)
 	{
 		super(agent, 1000);
-		
 		this.agent = agent;
+		
+//		onTick();
 	}
 	
 	@Override
 	public void onTick()
 	{
-		if (!selectProject())
-			agent.errorPrintln("ERROR: CPU: Error receiving file");
-		else
+		if (selectProject())
 			agent.addBehaviour(new CompileProjectBehaviour(pathToFolder));
+//		else
+//			agent.println("No project");
+
 	}
 	
 	public boolean selectProject()
