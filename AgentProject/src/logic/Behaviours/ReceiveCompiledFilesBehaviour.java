@@ -18,6 +18,7 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 	
 	public ReceiveCompiledFilesBehaviour()
 	{
+		
 	}
 	
 	@Override
@@ -66,7 +67,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 	{
 		try
 		{
-			if (!new File(Macros.clientProjectPath + "/" + cf.getProjectName() + "/" ).mkdirs())
+			String folderName = Macros.clientProjectPath + "/" + cf.getProjectName() + "/";
+			if (new File(folderName).exists() || !new File(folderName).mkdirs())
 				return false;
 			
 			Files.write(Paths.get(Macros.clientProjectPath + "/" + cf.getProjectName() + "/" + cf.getFilenameNoExtension() + Macros.binaryFileExtension), cf.getBinary(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);

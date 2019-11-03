@@ -16,10 +16,7 @@ import java.nio.file.StandardOpenOption;
 
 public class CompilationFile implements java.io.Serializable
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7664915223485892350L;
+
 	private String path;
 	private String filename;
 	private String projectname;
@@ -176,11 +173,6 @@ public class CompilationFile implements java.io.Serializable
 		}
 		 
 		return bo.toString();
-	}
-	
-	public static CompilationFile deserialize(String serializedObject)
-	{
-		return deserialize(serializedObject.getBytes());
 	}
 	
 	public static CompilationFile deserialize(byte[] serializedObject)

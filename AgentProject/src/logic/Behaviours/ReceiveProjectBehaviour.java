@@ -118,7 +118,7 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 			if (p.getName().equals("file"))
 			{
 				Object o = p.getValue();
-				CompilationFile cf = CompilationFile.deserialize((String)p.getValue());
+				CompilationFile cf = CompilationFile.deserialize(((String)p.getValue()).getBytes());
 				agent.getFiles().add(cf); 
 				
 				File f = new File(pathToFolder + "/" + cf.getFilename());
