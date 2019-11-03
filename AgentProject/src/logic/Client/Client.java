@@ -1,12 +1,13 @@
-package logic;
+package logic.Client;
 
 import java.util.ArrayList;
 
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-
+import logic.CompilationFile;
+import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Auction.Bid;
-import logic.Behaviours.OfferProjectBehaviour;
+import logic.Client.Behaviours.OfferProjectBehaviour;
 
 
 public class Client extends ExtendedAgent

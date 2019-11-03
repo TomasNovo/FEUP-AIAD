@@ -1,4 +1,4 @@
-package logic.Behaviours;
+package logic.CPU.Behaviours;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +15,10 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import logic.CPU;
-import logic.Client;
 import logic.CompilationFile;
 import logic.Macros;
-import logic.Behaviours.CompileProjectBehaviour;
+import logic.CPU.Behaviours.CompileProjectBehaviour;
+import logic.CPU.CPU;
 
 /*TODO
  * 

@@ -1,7 +1,7 @@
 package logic.Auction;
 
-import logic.Client;
 import logic.Macros;
+import logic.Client.Client;
 
 public class Bid {
 

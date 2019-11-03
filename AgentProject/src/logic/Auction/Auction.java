@@ -2,7 +2,8 @@ package logic.Auction;
 
 import java.util.ArrayList;
 
-import logic.Client;
+import logic.Client.Client;
+
 
 public class Auction {
 	

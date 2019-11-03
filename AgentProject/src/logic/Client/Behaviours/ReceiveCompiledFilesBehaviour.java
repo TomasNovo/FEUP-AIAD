@@ -1,4 +1,4 @@
-package logic.Behaviours;
+package logic.Client.Behaviours;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.nio.file.StandardOpenOption;
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import logic.Client;
 import logic.CompilationFile;
 import logic.Macros;
+import logic.Client.Client;
 
 public class ReceiveCompiledFilesBehaviour extends Behaviour
 {

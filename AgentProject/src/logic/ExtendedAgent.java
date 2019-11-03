@@ -5,6 +5,8 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import logic.CPU.CPU;
+import logic.Client.Client;
 
 public class ExtendedAgent extends Agent
 {

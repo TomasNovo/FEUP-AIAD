@@ -1,4 +1,4 @@
-package logic.Behaviours;
+package logic.Client.Behaviours;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -14,10 +14,10 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import logic.Client;
 import logic.CompilationFile;
 import logic.Macros;
-import logic.Behaviours.ReceiveCompiledFilesBehaviour;;
+import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
+import logic.Client.Client;;
 
 public class OfferProjectBehaviour extends Behaviour
 {

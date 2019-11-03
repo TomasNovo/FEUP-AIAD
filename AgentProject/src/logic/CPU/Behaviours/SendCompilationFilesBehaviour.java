@@ -1,8 +1,8 @@
-package logic.Behaviours;
+package logic.CPU.Behaviours;
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import logic.CPU;
+import logic.CPU.CPU;
 
 
 public class SendCompilationFilesBehaviour extends Behaviour

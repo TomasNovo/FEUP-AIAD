@@ -1,10 +1,10 @@
-package logic.Behaviours;
+package logic.CPU.Behaviours;
 
 import jade.core.behaviours.Behaviour;
-import logic.CPU;
+import logic.CPU.CPU;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
-import logic.Behaviours.SendCompilationFilesBehaviour;
+import logic.CPU.Behaviours.SendCompilationFilesBehaviour;
 
 public class CompileProjectBehaviour extends Behaviour
 {

@@ -1,11 +1,11 @@
-package logic;
+package logic.CPU;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import logic.CompilationFile;
-import logic.Behaviours.ReceiveProjectBehaviour;
-
+import logic.ExtendedAgent;
+import logic.CPU.Behaviours.ReceiveProjectBehaviour;
 import jade.core.AID;
 
 public class CPU extends ExtendedAgent
