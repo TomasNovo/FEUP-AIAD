@@ -44,8 +44,24 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 
 	}
 	
+//	@Override
+//	public boolean done()
+//	{
+//		return true;
+//	}
+	
 	public boolean selectProject()
 	{
+//		try
+//		{
+//			Thread.sleep(1000);
+//		}
+//		catch (InterruptedException e1)
+//		{
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		 
 		agent.initializeFiles();
 		
 		DFAgentDescription dfad = new DFAgentDescription();
@@ -114,7 +130,8 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 			{
 				Object o = p.getValue();
 				CompilationFile cf = CompilationFile.deserialize(((String)p.getValue()).getBytes());
-				agent.getFiles().add(cf); 
+				cf.path = pathToFolder;
+				agent.getFiles().add(cf);
 				
 				File f = new File(pathToFolder + "/" + cf.getFilename());
 						

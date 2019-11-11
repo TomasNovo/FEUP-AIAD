@@ -11,11 +11,11 @@ import jade.core.AID;
 public class CPU extends ExtendedAgent
 {
 	int id = 0;
-	private ArrayList<CompilationFile> files;
-	private String projectPath;
+	public ArrayList<CompilationFile> files;
+	public String projectPath;
 	
-	private AID clientAID;
-	private boolean clientFolder;
+	public AID clientAID;
+	public boolean clientFolder;
 	
 	@Override
 	protected void setup()
@@ -64,6 +64,11 @@ public class CPU extends ExtendedAgent
 	public boolean getClientFolder()
 	{
 		return this.clientFolder;
+	}
+	
+	public void removeFile(int index)
+	{
+		files.remove(index);
 	}
 
 }

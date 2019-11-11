@@ -57,7 +57,7 @@ public class OfferProjectBehaviour extends Behaviour
         {
             for (Path child : dirStream)
             {
-            	if (child.toFile().getName().contains(Macros.codeFileExtension))
+            	if (child.toFile().getName().endsWith(Macros.codeFileExtension))
             	{
             		CompilationFile cf = new CompilationFile(child.toFile());
             		agent.files.add(cf);
@@ -147,7 +147,7 @@ public class OfferProjectBehaviour extends Behaviour
 	@Override
 	public boolean done()
 	{
-		return sentClient;
+		return true;
 	}
 	
 }

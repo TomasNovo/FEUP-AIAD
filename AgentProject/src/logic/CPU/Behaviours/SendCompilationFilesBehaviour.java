@@ -1,7 +1,10 @@
 package logic.CPU.Behaviours;
 
+import java.util.ArrayList;
+
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import logic.CompilationFile;
 import logic.CPU.CPU;
 
 
@@ -10,13 +13,18 @@ public class SendCompilationFilesBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		for	(int i = 0; i < ((CPU) this.myAgent).getFiles().size(); i++)
+		CPU agent = (CPU) myAgent;
+		ArrayList<CompilationFile> files = agent.getFiles();
+		
+		for	(int i = 0; i < files.size(); i++)
 		{
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(((CPU) this.myAgent).getClientAID());
-			msg.setByteSequenceContent(((CPU) this.myAgent).getFiles().get(i).getBinary());
-			msg.addUserDefinedParameter("filename", ((CPU) this.myAgent).getFiles().get(i).getFilename());
-			((CPU) this.myAgent).send(msg);
+			msg.addReceiver(agent.getClientAID());
+			msg.setByteSequenceContent(files.get(i).getBinary());
+			msg.addUserDefinedParameter("filename", files.get(i).getFilename());
+			agent.send(msg);
+			
+			agent.removeFile(i);
 		}
 		
 	}
