@@ -1,5 +1,7 @@
 package logic.CPU.Behaviours;
 
+import java.util.ArrayList;
+
 import jade.core.behaviours.Behaviour;
 import logic.CPU.CPU;
 import logic.CompilationFile;
@@ -22,15 +24,24 @@ public class CompileProjectBehaviour extends Behaviour
 		agent = (CPU) myAgent;
 		
 		CompilationFile cf = null;
+		ArrayList<CompilationFile> files = agent.getFiles();
+		
+		if (files.size() == 0)
+			return;
 
-        for (int i = 0; i < agent.getFiles().size(); i++)
+        for (int i = 0; i < files.size(); i++)
         {
-        	cf = agent.getFiles().get(i);
+        	cf = files.get(i);
         	
-        	if (!cf.compile())
+        	if (cf.getBinary() == null) // Not already compiled
         	{
-        		((ExtendedAgent)myAgent).errorPrintln("Failed to compile " + cf.getFilename());
-        		return;
+        		if (!cf.compile())
+            	{
+            		((ExtendedAgent)myAgent).errorPrintln("Failed to compile " + cf.getFilename());
+            		return;
+            	}
+        		
+        		agent.files.set(i, cf);
         	}
 		}
         

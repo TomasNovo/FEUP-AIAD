@@ -11,6 +11,7 @@ import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
 import logic.Macros;
 import logic.Client.Client;
+import logic.Client.Behaviours.RemoveProjectBehaviour;
 
 public class ReceiveCompiledFilesBehaviour extends Behaviour
 {
@@ -60,18 +61,14 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 		}
 		
 		agent.println("Successfully received compilation files");
-		myAgent.addBehaviour(new RemoveProjectBehaviour());
+		agent.addBehaviour(new RemoveProjectBehaviour());
 	}
 	
 	public boolean saveBinary(CompilationFile cf)
 	{
 		try
 		{
-			String folderName = Macros.clientProjectPath + "/" + cf.getProjectName() + "/";
-			if (new File(folderName).exists() || !new File(folderName).mkdirs())
-				return false;
-			
-			Files.write(Paths.get(Macros.clientProjectPath + "/" + cf.getProjectName() + "/" + cf.getFilenameNoExtension() + Macros.binaryFileExtension), cf.getBinary(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			Files.write(Paths.get(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension), cf.getBinary(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 		}
 		catch (IOException e)
 		{

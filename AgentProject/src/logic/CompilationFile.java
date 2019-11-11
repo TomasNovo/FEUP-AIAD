@@ -17,14 +17,14 @@ import java.nio.file.StandardOpenOption;
 public class CompilationFile implements java.io.Serializable
 {
 
-	private String path;
-	private String filename;
-	private String projectname;
-	private String filenameNoExtention;
-	private String text;
-	private byte[] binary;
-	private int size;
-	private double compilationTime;
+	public String path;
+	public String filename;
+	public String projectname;
+	public String filenameNoExtention;
+	public String text;
+	public byte[] binary;
+	public int size;
+	public double compilationTime;
 	
 	public CompilationFile()
 	{
@@ -35,7 +35,7 @@ public class CompilationFile implements java.io.Serializable
 	{
         try
 		{
-    		path = file.getAbsolutePath();
+    		path = file.getParent();
     		projectname = file.getParentFile().getName();
 			filename = file.getName();
 			filenameNoExtention = filename.substring(0, filename.indexOf('.'));
@@ -71,9 +71,9 @@ public class CompilationFile implements java.io.Serializable
 		Process process;
 		try
 		{
-    		String folder = path.substring(0, path.lastIndexOf(File.separator) + 1);
-			String binaryPath = folder + filenameNoExtention + Macros.binaryFileExtension;
-			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + path + "\"";
+			String binaryPath = path + "/" + filenameNoExtention + Macros.binaryFileExtension;
+			String codePath = path + "/" + filenameNoExtention + Macros.codeFileExtension;
+			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + codePath + "\"";
 			
 			process = Runtime.getRuntime().exec(command);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
