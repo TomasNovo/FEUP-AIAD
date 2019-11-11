@@ -6,6 +6,7 @@ import jade.core.behaviours.Behaviour;
 import logic.CPU.CPU;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
+import logic.Macros;
 import logic.CPU.Behaviours.SendCompilationFilesBehaviour;
 
 public class CompileProjectBehaviour extends Behaviour
@@ -24,24 +25,21 @@ public class CompileProjectBehaviour extends Behaviour
 		agent = (CPU) myAgent;
 		
 		CompilationFile cf = null;
-		ArrayList<CompilationFile> files = agent.getFiles();
 		
-		if (files.size() == 0)
+		if (agent.files.size() == 0)
 			return;
 
-        for (int i = 0; i < files.size(); i++)
+        for (int i = 0; i < agent.files.size(); i++)
         {
-        	cf = files.get(i);
+        	cf = agent.files.get(i);
         	
-        	if (cf.getBinary() == null) // Not already compiled
+        	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
         	{
         		if (!cf.compile())
             	{
             		((ExtendedAgent)myAgent).errorPrintln("Failed to compile " + cf.getFilename());
             		return;
             	}
-        		
-        		agent.files.set(i, cf);
         	}
 		}
         

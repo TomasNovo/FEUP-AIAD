@@ -69,9 +69,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 			}
 		}
 		
-		linkProject();
-		
 		agent.println("Successfully received compilation files");
+		linkProject();
 		agent.addBehaviour(new RemoveProjectBehaviour());
 	}
 	
@@ -129,6 +128,7 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 			e.printStackTrace();
 		}
 		
+		agent.println("Successfully built project " + agent.projectName);
 		return true;
 	}
 	

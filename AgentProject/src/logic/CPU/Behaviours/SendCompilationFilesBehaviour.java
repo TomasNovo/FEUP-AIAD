@@ -14,17 +14,19 @@ public class SendCompilationFilesBehaviour extends Behaviour
 	public void action()
 	{
 		CPU agent = (CPU) myAgent;
-		ArrayList<CompilationFile> files = agent.getFiles();
 		
-		for	(int i = 0; i < files.size(); i++)
+		while (agent.files.size() > 0)
 		{
-			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(agent.getClientAID());
-			msg.setByteSequenceContent(files.get(i).getBinary());
-			msg.addUserDefinedParameter("filename", files.get(i).getFilename());
-			agent.send(msg);
+			if (agent.files.get(0).binary != null)
+			{
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				msg.addReceiver(agent.getClientAID());
+				msg.setByteSequenceContent(agent.files.get(0).getBinary());
+				msg.addUserDefinedParameter("filename", agent.files.get(0).getFilename());
+				agent.send(msg);
+			}
 			
-			agent.removeFile(i);
+			agent.files.remove(0);
 		}
 		
 	}

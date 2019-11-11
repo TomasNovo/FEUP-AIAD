@@ -3,6 +3,7 @@ package logic;
 public class Macros
 {
 	public static final String codeFileExtension = ".cpp";
+	public static final String headerFileExtension = ".h";
 	public static final String binaryFileExtension = ".o";
 	
 	public static final char seconds = 's';

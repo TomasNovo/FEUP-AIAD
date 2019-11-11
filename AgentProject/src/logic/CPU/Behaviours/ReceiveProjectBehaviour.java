@@ -112,10 +112,11 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 			
 			if (p.getName().equals("file"))
 			{
-				Object o = p.getValue();
 				CompilationFile cf = CompilationFile.deserialize(((String)p.getValue()).getBytes());
 				cf.path = pathToFolder;
-				agent.getFiles().add(cf);
+				
+				if (cf.extension.equals(Macros.codeFileExtension))
+					agent.getFiles().add(cf);
 				
 				File f = new File(pathToFolder + "/" + cf.getFilename());
 						
@@ -133,11 +134,6 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 		}
 
 		return true;
-	}
-	
-	public boolean createClientFolder()
-	{
-		return new File(Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName()).mkdirs();
 	}
 	
 	public boolean createProjectFolder(String filename)

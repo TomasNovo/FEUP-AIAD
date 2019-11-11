@@ -21,6 +21,7 @@ public class CompilationFile implements java.io.Serializable
 	public String filename;
 	public String projectname;
 	public String filenameNoExtention;
+	public String extension;
 	public String text;
 	public byte[] binary;
 	public int size;
@@ -39,6 +40,7 @@ public class CompilationFile implements java.io.Serializable
     		projectname = file.getParentFile().getName();
 			filename = file.getName();
 			filenameNoExtention = filename.substring(0, filename.indexOf('.'));
+			extension = filename.substring(filename.lastIndexOf('.'));
 			
     		BufferedReader in = new BufferedReader(new FileReader(file));
     		text = "";

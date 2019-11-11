@@ -55,10 +55,13 @@ public class OfferProjectBehaviour extends Behaviour
         {
             for (Path child : dirStream)
             {
-            	if (child.toFile().getName().endsWith(Macros.codeFileExtension))
+            	String filename = child.toFile().getName();
+            	if (filename.endsWith(Macros.codeFileExtension) || filename.endsWith(Macros.headerFileExtension))
             	{
             		CompilationFile cf = new CompilationFile(child.toFile());
-            		agent.files.add(cf);
+            		
+            		if (filename.endsWith(Macros.codeFileExtension))
+            			agent.files.add(cf);
             		
             		p = new Property("file", cf.serialize());
             		sd.addProperties(p);
