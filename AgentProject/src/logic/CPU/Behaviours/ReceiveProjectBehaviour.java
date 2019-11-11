@@ -30,8 +30,6 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	{
 		super(agent, 1000);
 		this.agent = agent;
-		
-//		onTick();
 	}
 	
 	@Override
@@ -44,24 +42,10 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 
 	}
 	
-//	@Override
-//	public boolean done()
-//	{
-//		return true;
-//	}
 	
 	public boolean selectProject()
 	{
-//		try
-//		{
-//			Thread.sleep(1000);
-//		}
-//		catch (InterruptedException e1)
-//		{
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		 
+
 		agent.initializeFiles();
 		
 		DFAgentDescription dfad = new DFAgentDescription();
