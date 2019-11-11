@@ -21,14 +21,12 @@ import logic.Client.Client;;
 
 public class OfferProjectBehaviour extends Behaviour
 {
-	Client agent;
-	
+	Client agent;	
 	boolean sentClient = false;
-	String projectPath;
 	
-	public OfferProjectBehaviour(String f)
+	public OfferProjectBehaviour()
 	{
-		this.projectPath = f;
+		
 	}
 	
 	@Override
@@ -47,13 +45,13 @@ public class OfferProjectBehaviour extends Behaviour
 		DFAgentDescription dfad = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
 		
-		sd.setName(projectPath);
+		sd.setName(agent.projectName);
 		sd.setType("project");
 		
 		Property p = new Property("deadline", new Integer(agent.b.getDeadlineInSeconds()).toString()); // Sets project deadline
 		sd.addProperties(p);
 		
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(Macros.clientProjectPath + "/" + projectPath)))
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(agent.projectPath)))
         {
             for (Path child : dirStream)
             {
@@ -76,70 +74,6 @@ public class OfferProjectBehaviour extends Behaviour
 			e.printStackTrace();
 			return false;
 		}			
-		
-		return true;
-	}
-	
-	public boolean findCPUs()
-	{
-		DFAgentDescription dfad = new DFAgentDescription();
-		
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("CPU");
-		dfad.addServices(sd);
-		
-		try
-		{
-			agent.CPUs = DFService.search(this.myAgent, dfad);
-		}
-		catch (FIPAException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
-		
-		return true;
-	}
-
-	public void sendClientAID()
-	{
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent(agent.getAID().getName());
-		msg.addReceiver(agent.CPUs[0].getName());
-		agent.send(msg);
-	}
-	
-	public boolean sendFileToCompile()
-	{
-		agent.files = new ArrayList<CompilationFile>();
-		
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(projectPath)))
-        {
-            for (Path child : dirStream)
-            {
-            	if (child.toFile().getName().contains(Macros.codeFileExtension))
-            		agent.files.add(new CompilationFile(child.toFile()));
-    		}
-            
-        }
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
-		
-        byte[] fileContent = null;
-		
-		for (int i = 0; i < agent.files.size(); i++)
-		{
-			CompilationFile cf = agent.files.get(i);
-			
-			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(agent.CPUs[0].getName());
-			msg.setByteSequenceContent(cf.getText().getBytes());
-			msg.addUserDefinedParameter("filename", cf.getFilename());
-			agent.send(msg);
-		}
 		
 		return true;
 	}

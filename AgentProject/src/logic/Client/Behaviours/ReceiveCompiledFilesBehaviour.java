@@ -20,6 +20,7 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 {
 	Client agent;
 	ArrayList<String> projectFiles;
+	String projectPath;
 	
 	public ReceiveCompiledFilesBehaviour()
 	{
@@ -53,6 +54,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 					}
 					
 					projectFiles.add(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension);
+
+					
 					
 					found = true;
 					break;
@@ -91,7 +94,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 	{
 		try
 		{
-			String command = "g++ -o main";
+			String execName = "main";
+			String command = "g++ -o " + agent.projectPath + "/" + execName;
 			
 			for (int i = 0; i < projectFiles.size(); i++)
 			{

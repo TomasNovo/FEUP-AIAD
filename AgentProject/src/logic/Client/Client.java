@@ -16,6 +16,7 @@ public class Client extends ExtendedAgent
 	public int id = 0;
 	public ArrayList<CompilationFile> files;
 	public DFAgentDescription[] CPUs;
+	public String projectName;
 	public String projectPath;
 	public String deadline;
 	public Bid b;
@@ -33,15 +34,15 @@ public class Client extends ExtendedAgent
 		
 		if(args != null && args.length > 0 && args.length == 2) 
         {
-			projectPath = args[0].toString();
-            System.out.println("ProjectPath: "+ projectPath);
-            
+			projectName = args[0].toString();
+			projectPath = Macros.clientProjectPath + "/" + projectName;
+			
             deadline = args[1].toString();
             System.out.println("Deadline: "+ deadline);
             
             b = new Bid(this, deadline);
         
-    		addBehaviour(new OfferProjectBehaviour(projectPath));
+    		addBehaviour(new OfferProjectBehaviour());
         }
 	
 	}
