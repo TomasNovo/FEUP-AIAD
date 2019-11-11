@@ -1,5 +1,15 @@
-- Cliente que cancela a encomenda quando acaba o tempo e cliente que tem tolerância.
-- Alterar rácios de clientes que são tolerantes e não tolerantes.
-- CPU tem a certeza que não consegue compilar o projeto a tempo e negocia o tempo com o cliente para verificara as consequências da interação dos dois agentes.
-- Escolher uma heurística tipo tamanho, ou media de últimos projetos compilados.
-Alterar o ratio de cpus e clientes e verificar o efeito.
+﻿Implementar negociação:
+
+- Cliente tem valor random de tolerância. Pode cancelar a encomenda caso seja intolerante à negociação do CPU
+ou pode negociar caso seja tolerante
+
+- Cpu recebe oferta e acha/tem a certeza que não tem tempo: em vez de recusar negoceia. Esta certeza advém
+de por ex cada CPU poder ter um número fixo ou média das 10 ultimas compilações estabelecendo uma 
+heurística de nº ficheiros/tamanho
+
+ex: "Em 10 nao consigo, faço em 15" cliente responde "em 15 nao da mas aceito em 13"
+	  
+- Importante é a negociação -> impacto, nº passos de negociação ---> decisão independente da interação
+
+Testar:
+- Alterar o ratio de CPU's e clientes e verificar efeitos.
