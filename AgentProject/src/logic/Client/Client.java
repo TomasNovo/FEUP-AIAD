@@ -1,6 +1,7 @@
 package logic.Client;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import logic.CompilationFile;
@@ -18,6 +19,7 @@ public class Client extends ExtendedAgent
 	public String projectPath;
 	public String deadline;
 	public Bid b;
+	public float tolerance;
 	
 	@Override
 	protected void setup()
@@ -42,5 +44,45 @@ public class Client extends ExtendedAgent
     		addBehaviour(new OfferProjectBehaviour(projectPath));
         }
 	
+	}
+	
+	/*
+	 * Tolerance will be a random percentage
+	 */
+	protected void setTolerance(boolean random, int t)
+	{
+		if(random)
+		{
+			Random r = new Random();
+			int low = 1; //inclusive
+			int high = 101; // exclusive
+			int result = r.nextInt(high-low) + low;
+			this.tolerance = result / 100;
+		}
+		else 
+		{
+			this.tolerance = t / 100;
+		}
+	}
+	
+	/*
+	 * This value is used in negotiations in the following way:
+	 * 
+	 * Client has a random % value of tolerance. While negotiating,
+	 * if the CPU knows that it can't compile on the deadline that the Client
+	 * specified, the CPU will propose a new deadline. According to Client's 
+	 * tolerance he will do the following:
+	 * 
+	 * if deadline proposed of CPU <= initial deadline + Client Tolerance * initial deadline
+	 * 		accept negotiation
+	 * 
+	 * else 
+	 * 		reject negotiation
+	 * 
+	 */
+	protected float getToleranceOfDeadline()
+	{
+		return this.tolerance * this.b.getDeadlineInSeconds();
+		
 	}
 }
