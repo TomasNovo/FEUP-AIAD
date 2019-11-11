@@ -1,0 +1,5 @@
+- Cliente que cancela a encomenda quando acaba o tempo e cliente que tem tolerância.
+- Alterar rácios de clientes que são tolerantes e não tolerantes.
+- CPU tem a certeza que não consegue compilar o projeto a tempo e negocia o tempo com o cliente para verificara as consequências da interação dos dois agentes.
+- Escolher uma heurística tipo tamanho, ou media de últimos projetos compilados.
+Alterar o ratio de cpus e clientes e verificar o efeito.
