@@ -1,10 +1,13 @@
 package logic.Client.Behaviours;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -16,10 +19,11 @@ import logic.Client.Behaviours.RemoveProjectBehaviour;
 public class ReceiveCompiledFilesBehaviour extends Behaviour
 {
 	Client agent;
+	ArrayList<String> projectFiles;
 	
 	public ReceiveCompiledFilesBehaviour()
 	{
-		
+		projectFiles = new ArrayList<String>();
 	}
 	
 	@Override
@@ -48,6 +52,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 						return;
 					}
 					
+					projectFiles.add(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension);
+					
 					found = true;
 					break;
 				}
@@ -59,6 +65,8 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 				return;
 			}
 		}
+		
+		linkProject();
 		
 		agent.println("Successfully received compilation files");
 		agent.addBehaviour(new RemoveProjectBehaviour());
@@ -74,6 +82,47 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 		{
 			e.printStackTrace();
 			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean linkProject()
+	{
+		try
+		{
+			String command = "g++ -o main";
+			
+			for (int i = 0; i < projectFiles.size(); i++)
+			{
+				command += " " + projectFiles.get(i);
+			}
+			
+			Process process;
+			process = Runtime.getRuntime().exec(command);
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			
+			while (process.isAlive())
+			{}
+			
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				System.err.println(line);
+			}
+			
+			int returnValue = process.exitValue();
+
+			if (returnValue != 0)
+			{
+				agent.errorPrintln("Failed to link!");
+				return false;
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 		
 		return true;
