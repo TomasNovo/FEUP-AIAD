@@ -1,4 +1,4 @@
-package logic.CPU.Behaviours;
+package logic.CPU.Behaviours.Negotiation;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -19,6 +19,7 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.CPU.CPU;
 import logic.Client.Client;
+import logic.CPU.Behaviours.Negotiation.ReceiveResponseBehaviour;
 
 public class SendNegotiationBehaviour extends Behaviour
 {
@@ -40,6 +41,8 @@ public class SendNegotiationBehaviour extends Behaviour
 			if(sendClientProposal() != 0)
 				return;
 		}
+		
+		agent.addBehaviour(new ReceiveResponseBehaviour());
 
 	}
 	
@@ -60,8 +63,8 @@ public class SendNegotiationBehaviour extends Behaviour
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent(calculateNewProposedDeadline());
-		System.out.println("CPU sending: " + msg.getContent());
-		msg.addReceiver(new AID("TestClient", AID.ISLOCALNAME));
+		agent.println("CPU sending: " + msg.getContent());
+		msg.addReceiver(new AID("Client", AID.ISLOCALNAME));
 		agent.send(msg);
 		
 		return 0;

@@ -7,7 +7,15 @@ import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Auction.Bid;
 import logic.CPU.Behaviours.ReceiveProjectBehaviour;
+import logic.CPU.Behaviours.Negotiation.SendNegotiationBehaviour;
 import jade.core.AID;
+
+/**
+ * 
+ * TODO: 
+ * - Get deadline by DF
+ * - Create function to calculate new deadline
+ */
 
 public class CPU extends ExtendedAgent
 {
@@ -26,13 +34,20 @@ public class CPU extends ExtendedAgent
 	protected void setup()
 	{
 		super.setup();
+		
+		System.out.println("Hey! Its me, " + getAID().getName());
+		
+		bidIsAcceptable = false;
+		
+		// TODO receive Client's bid by DF
+		b = new Bid(this, "10m");
+		
 		registerDF();
 		
 		new File("CPU-Projects").mkdirs();
 		
 		addBehaviour(new ReceiveProjectBehaviour(this));
-		
-		println("Ola!");
+		//addBehaviour(new SendNegotiationBehaviour());
 	}
 	
 	public void initializeFiles()

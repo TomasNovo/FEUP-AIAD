@@ -9,6 +9,7 @@ import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Auction.Bid;
 import logic.Client.Behaviours.OfferProjectBehaviour;
+import logic.Client.Behaviours.Negation.ReceiveNegotiationBehaviour;
 
 
 public class Client extends ExtendedAgent
@@ -43,13 +44,17 @@ public class Client extends ExtendedAgent
 			projectPath = Macros.clientProjectPath + "/" + projectName;
 			
             deadline = args[1].toString();
-            System.out.println("Deadline: "+ deadline);
             
+            this.setTolerance(true, 0);
+    		
             b = new Bid(this, deadline);
         
     		addBehaviour(new OfferProjectBehaviour());
+            
         }
 	
+
+        //addBehaviour(new ReceiveNegotiationBehaviour());
 	}
 	
 	/*
@@ -57,7 +62,7 @@ public class Client extends ExtendedAgent
 	 * 
 	 * int t is for testing purposes if random == false
 	 */
-	public void setTolerance(boolean random, int t)
+	protected void setTolerance(boolean random, int t)
 	{
 		if(random)
 		{
@@ -65,24 +70,25 @@ public class Client extends ExtendedAgent
 			int low = 1; //inclusive
 			int high = 101; // exclusive
 			float result = r.nextInt(high-low) + low;
-			this.tolerance = (float) 0.01;
+			this.tolerance = result / 100;
 		}
 		else
 		{
 			this.tolerance = t / 100;
-			
 		}
+		
+		this.println("Tolerance: " + this.tolerance);
 	}
 	
 	public boolean checkCPUProposal()
 	{		
-	  if(bcpu.getDeadlineInSeconds() < bcpu.getDeadlineInSeconds() + this.getToleranceOfDeadline())
+	  if(bcpu.getDeadlineInSeconds() < b.getDeadlineInSeconds() + this.getToleranceOfDeadline())
 	  {
-		  System.out.println("New deadline accepted");
+		  this.println("New deadline accepted");
 		  return true;
 	  }
 			
-	  	System.out.println("New deadline rejected");
+	  	this.println("New deadline rejected");
 		return false;
 	}
 	

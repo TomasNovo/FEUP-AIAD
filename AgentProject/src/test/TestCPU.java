@@ -23,10 +23,6 @@ public class TestCPU extends ExtendedAgent
 	{
 		super.setup();
 		
-		bidIsAcceptable = false;
-		
-		b = new Bid(this, "10m");
-		
 		addBehaviour(new SendCPUNegotiationBehaviour());
 		
 		System.out.println("Hey! Its me, " + getAID().getName());
