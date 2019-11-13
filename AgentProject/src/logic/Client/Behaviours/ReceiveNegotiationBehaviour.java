@@ -1,17 +1,18 @@
-package test;
+package logic.Client.Behaviours;
 
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import logic.Auction.Bid;
+import logic.Client.Client;
 
-public class ReceiveNegotiationClientBehaviour extends Behaviour
+public class ReceiveNegotiationBehaviour extends Behaviour
 {
 
-	TestClient agent;	
+	Client agent;	
 	boolean received = false;
 	
-	public ReceiveNegotiationClientBehaviour()
+	public ReceiveNegotiationBehaviour()
 	{
 		
 	}
@@ -19,7 +20,7 @@ public class ReceiveNegotiationClientBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		agent = (TestClient) myAgent;
+		agent = (Client) myAgent;
 		
 		if(receiveNegotiation() != 0) 
 		{System.out.println("ERROR: CPU: Error receiving negotiation"); block();}

@@ -19,8 +19,13 @@ public class Client extends ExtendedAgent
 	public String projectName;
 	public String projectPath;
 	public String deadline;
+	
+	//initial bid
 	public Bid b;
 	public float tolerance;
+	
+	//received bid 
+	public Bid bcpu;
 	
 	@Override
 	protected void setup()
@@ -49,21 +54,36 @@ public class Client extends ExtendedAgent
 	
 	/*
 	 * Tolerance will be a random percentage
+	 * 
+	 * int t is for testing purposes if random == false
 	 */
-	protected void setTolerance(boolean random, int t)
+	public void setTolerance(boolean random, int t)
 	{
 		if(random)
 		{
 			Random r = new Random();
 			int low = 1; //inclusive
 			int high = 101; // exclusive
-			int result = r.nextInt(high-low) + low;
-			this.tolerance = result / 100;
+			float result = r.nextInt(high-low) + low;
+			this.tolerance = (float) 0.01;
 		}
-		else 
+		else
 		{
 			this.tolerance = t / 100;
+			
 		}
+	}
+	
+	public boolean checkCPUProposal()
+	{		
+	  if(bcpu.getDeadlineInSeconds() < bcpu.getDeadlineInSeconds() + this.getToleranceOfDeadline())
+	  {
+		  System.out.println("New deadline accepted");
+		  return true;
+	  }
+			
+	  	System.out.println("New deadline rejected");
+		return false;
 	}
 	
 	/*
@@ -81,7 +101,7 @@ public class Client extends ExtendedAgent
 	 * 		reject negotiation
 	 * 
 	 */
-	protected float getToleranceOfDeadline()
+	public float getToleranceOfDeadline()
 	{
 		return this.tolerance * this.b.getDeadlineInSeconds();
 	}

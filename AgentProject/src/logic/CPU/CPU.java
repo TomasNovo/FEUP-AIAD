@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import logic.CompilationFile;
 import logic.ExtendedAgent;
+import logic.Auction.Bid;
 import logic.CPU.Behaviours.ReceiveProjectBehaviour;
 import jade.core.AID;
 
@@ -16,6 +17,10 @@ public class CPU extends ExtendedAgent
 	
 	public AID clientAID;
 	public boolean clientFolder;
+	
+	// Negotiation Attributes
+	public Bid b;
+	public boolean bidIsAcceptable;
 	
 	@Override
 	protected void setup()
