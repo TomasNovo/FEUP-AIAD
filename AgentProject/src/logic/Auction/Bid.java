@@ -1,11 +1,12 @@
 package logic.Auction;
 
+import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Client.Client;
 
 public class Bid {
 
-	private final Client bidder;
+	private final ExtendedAgent	 bidder;
 	
 	/**
 	 * Can be h(hours), m(minutes), s(seconds)
@@ -17,7 +18,7 @@ public class Bid {
 	
 	private int deadlineInSeconds = 0;
 	
-	public Bid(Client b, String d)
+	public Bid(ExtendedAgent b, String d)
 	{
 		this.bidder = b;
 		this.deadline = d;

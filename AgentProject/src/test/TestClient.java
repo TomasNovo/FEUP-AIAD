@@ -1,54 +1,45 @@
-package logic.Client;
+package test;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import jade.core.AID;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Auction.Bid;
-import logic.Client.Behaviours.OfferProjectBehaviour;
+import test.SendCPUNegotiationBehaviour;
 
 
-public class Client extends ExtendedAgent
+public class TestClient extends ExtendedAgent
 {
-	public int id = 0;
-	public ArrayList<CompilationFile> files;
-	public DFAgentDescription[] CPUs;
-	public String projectName;
-	public String projectPath;
-	public String deadline;
+	
+	// Initial bid
+	public Bid bi = new Bid(this, "10m");
+	
+	// Received bid
 	public Bid b;
+	
 	public float tolerance;
 	
 	@Override
 	protected void setup()
 	{
 		super.setup();
-		registerDF();
-		
-		println("Hey! Its me, " + getAID().getName());
-		
-		Object[] args = getArguments();
-		
-		if(args != null && args.length > 0 && args.length == 2) 
-        {
-			projectName = args[0].toString();
-			projectPath = Macros.clientProjectPath + "/" + projectName;
 			
-            deadline = args[1].toString();
-            System.out.println("Deadline: "+ deadline);
-            
-            b = new Bid(this, deadline);
-        
-    		addBehaviour(new OfferProjectBehaviour());
-        }
-	
+		this.setTolerance(true, 0);
+		
+		System.out.println("Hey! Its me, " + getAID().getName());
+		
+		addBehaviour(new ReceiveNegotiationClientBehaviour());
 	}
 	
 	/*
 	 * Tolerance will be a random percentage
+	 * 
+	 * int t is for testing purposes if random == false
 	 */
 	protected void setTolerance(boolean random, int t)
 	{
@@ -57,13 +48,26 @@ public class Client extends ExtendedAgent
 			Random r = new Random();
 			int low = 1; //inclusive
 			int high = 101; // exclusive
-			int result = r.nextInt(high-low) + low;
-			this.tolerance = result / 100;
+			float result = r.nextInt(high-low) + low;
+			this.tolerance = (float) 0.01;
 		}
-		else 
+		else
 		{
 			this.tolerance = t / 100;
+			
 		}
+	}
+	
+	protected boolean checkCPUProposal()
+	{		
+	  if(b.getDeadlineInSeconds() < bi.getDeadlineInSeconds() + this.getToleranceOfDeadline())
+	  {
+		  System.out.println("New deadline accepted");
+		  return true;
+	  }
+			
+	  	System.out.println("New deadline rejected");
+		return false;
 	}
 	
 	/*
@@ -85,4 +89,5 @@ public class Client extends ExtendedAgent
 	{
 		return this.tolerance * this.b.getDeadlineInSeconds();
 	}
+	
 }
