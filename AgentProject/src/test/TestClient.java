@@ -28,10 +28,10 @@ public class TestClient extends ExtendedAgent
 	protected void setup()
 	{
 		super.setup();
-			
-		this.setTolerance(true, 0);
 		
 		System.out.println("Hey! Its me, " + getAID().getName());
+		
+		this.setTolerance(true, 0);
 		
 		addBehaviour(new ReceiveNegotiationClientBehaviour());
 	}
@@ -49,24 +49,25 @@ public class TestClient extends ExtendedAgent
 			int low = 1; //inclusive
 			int high = 101; // exclusive
 			float result = r.nextInt(high-low) + low;
-			this.tolerance = (float) 0.01;
+			this.tolerance = result / 100;
 		}
 		else
 		{
 			this.tolerance = t / 100;
-			
 		}
+		
+		this.println("Tolerance: " + this.tolerance);
 	}
 	
 	protected boolean checkCPUProposal()
 	{		
 	  if(b.getDeadlineInSeconds() < bi.getDeadlineInSeconds() + this.getToleranceOfDeadline())
 	  {
-		  System.out.println("New deadline accepted");
+		  this.println("New deadline accepted");
 		  return true;
 	  }
 			
-	  	System.out.println("New deadline rejected");
+	  	this.println("New deadline rejected");
 		return false;
 	}
 	

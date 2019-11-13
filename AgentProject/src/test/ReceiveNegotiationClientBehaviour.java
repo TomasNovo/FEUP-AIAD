@@ -22,9 +22,12 @@ public class ReceiveNegotiationClientBehaviour extends Behaviour
 		agent = (TestClient) myAgent;
 		
 		if(receiveNegotiation() != 0) 
-		{System.out.println("ERROR: CPU: Error receiving negotiation"); block();}
+		{agent.println("ERROR: CPU: Error receiving negotiation"); block();}
 		
-		agent.checkCPUProposal();
+		if(agent.checkCPUProposal())
+			agent.addBehaviour(new SendClientResponseBehaviour("Negotiation accepted"));
+		else 
+			agent.addBehaviour(new SendClientResponseBehaviour("Negotiation rejected"));
 			
 	}
 	
@@ -40,7 +43,7 @@ public class ReceiveNegotiationClientBehaviour extends Behaviour
         if (msg != null)
         {
         	agent.b = new Bid(agent, msg.getContent() + 's');
-    		System.out.println("Client received: " + msg.getContent());
+    		agent.println("Client received: " + msg.getContent());
 
             return 0;
         }

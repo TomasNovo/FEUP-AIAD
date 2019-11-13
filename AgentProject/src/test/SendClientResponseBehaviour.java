@@ -19,50 +19,33 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.Client.Client;
 
-public class SendCPUNegotiationBehaviour extends Behaviour
-{
-	TestCPU agent;	
-	boolean sentClient = false;
+public class SendClientResponseBehaviour extends Behaviour{
+
+	TestClient agent;	
+	String message;
+	boolean sent = false;
 	
-	public SendCPUNegotiationBehaviour()
+	public SendClientResponseBehaviour(String m)
 	{
-		
+		this.message = m;
 	}
 	
 	@Override
 	public void action()
 	{
-		agent = (TestCPU) myAgent;
+		agent = (TestClient) myAgent;
 		
-		if(!agent.bidIsAcceptable)
-		{
-			if(sendClientProposal() != 0)
-				return;
-		}
 		
-		agent.addBehaviour(new ReceiveResponseBehaviour());
-
+		if(sendResponse() != 0)
+			agent.errorPrintln("Error sending response");
 	}
 	
-	public String calculateNewProposedDeadline()
-	{
-		// chamar função que define incremento do proposed deadline
-		
-		int d = agent.b.getDeadlineInSeconds();
-
-		d += 120;
-		
-		// incrementar D com valor da funçao
-		
-		return Integer.toString(d);
-	}
-	
-	public int sendClientProposal()
+	public int sendResponse()
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent(calculateNewProposedDeadline());
-		agent.println("CPU sending: " + msg.getContent());
-		msg.addReceiver(new AID("TestClient", AID.ISLOCALNAME));
+		msg.setContent(message);
+		agent.println("Client response: " + msg.getContent());
+		msg.addReceiver(new AID("TestCPU", AID.ISLOCALNAME));
 		agent.send(msg);
 		
 		return 0;
@@ -74,5 +57,4 @@ public class SendCPUNegotiationBehaviour extends Behaviour
 	{
 		return true;
 	}
-	
 }
