@@ -16,7 +16,8 @@ import java.nio.file.StandardOpenOption;
 
 public class CompilationFile implements java.io.Serializable
 {
-
+	private static final long serialVersionUID = 2062965636861017777L;
+	
 	public String path;
 	public String filename;
 	public String projectname;

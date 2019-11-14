@@ -49,6 +49,28 @@ public class ExtendedAgent extends Agent
 		
 	}
 	
+	public DFAgentDescription[] searchDF(String type)
+	{
+		DFAgentDescription dfad = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(type);
+		dfad.addServices(sd);
+		
+		DFAgentDescription[] projects;
+		
+		try
+		{
+			projects = DFService.search(this, dfad);
+		}
+		catch (FIPAException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+		
+		return projects;
+	}
+	
 	public void println(String message)
 	{
 		System.out.println(buildMessage("INFO", message));
