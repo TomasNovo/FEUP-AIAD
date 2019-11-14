@@ -42,7 +42,7 @@ public class CompileProjectBehaviour extends Behaviour
         	
         	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
         	{
-        		saveTimeToFile();
+        		saveCompilationTime();
         		
         		if (!cf.compile())
             	{
@@ -56,26 +56,9 @@ public class CompileProjectBehaviour extends Behaviour
         agent.addBehaviour(new SendCompilationFilesBehaviour());
 	}
 
-	public boolean saveTimeToFile()
+	public void saveCompilationTime()
 	{
-		System.out.println("Time :" + cf.getCompilationTime());
-		File f = new File(Macros.cpuProjectPath + "/" + "times.txt");
-		try {
-			f.createNewFile();
-			
-			FileWriter fw = new FileWriter(f, true);
-		    BufferedWriter bw = new BufferedWriter(fw);
-		    bw.write(Double.toString(cf.getCompilationTime()));
-		    bw.newLine();
-		    bw.close();
-			
-			return true;
-		} catch (IOException e) {
-			agent.println("Error creating times file");
-			e.printStackTrace();
-		}
-		
-		return false;
+		agent.compilationTimes.add(cf.getCompilationTime());
 	}
 	
 	@Override
