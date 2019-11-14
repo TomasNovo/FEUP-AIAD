@@ -1,5 +1,6 @@
 package logic.Client;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,6 +21,7 @@ public class Client extends ExtendedAgent
 	public String projectName;
 	public String projectPath;
 	public String deadline;
+	public int numberOfProjectFiles;
 	
 	//initial bid
 	public Bid b;
@@ -42,6 +44,7 @@ public class Client extends ExtendedAgent
         {
 			projectName = args[0].toString();
 			projectPath = Macros.clientProjectPath + "/" + projectName;
+			numberOfProjectFiles = getNumberOfProjectFiles();
 			
             deadline = args[1].toString();
             
@@ -110,5 +113,10 @@ public class Client extends ExtendedAgent
 	public float getToleranceOfDeadline()
 	{
 		return this.tolerance * this.b.getDeadlineInSeconds();
+	}
+	
+	public int getNumberOfProjectFiles()
+	{
+		return new File(this.projectPath).list().length;
 	}
 }

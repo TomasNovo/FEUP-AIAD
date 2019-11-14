@@ -42,7 +42,7 @@ public class CompileProjectBehaviour extends Behaviour
         	
         	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
         	{
-        		saveTimes();
+        		saveTimeToFile();
         		
         		if (!cf.compile())
             	{
@@ -56,7 +56,7 @@ public class CompileProjectBehaviour extends Behaviour
         agent.addBehaviour(new SendCompilationFilesBehaviour());
 	}
 
-	public boolean saveTimes()
+	public boolean saveTimeToFile()
 	{
 		System.out.println("Time :" + cf.getCompilationTime());
 		File f = new File(Macros.cpuProjectPath + "/" + "times.txt");
