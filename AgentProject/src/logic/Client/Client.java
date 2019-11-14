@@ -10,7 +10,7 @@ import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Auction.Bid;
 import logic.Client.Behaviours.OfferProjectBehaviour;
-import logic.Client.Behaviours.Negation.ReceiveNegotiationBehaviour;
+import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 
 
 public class Client extends ExtendedAgent
@@ -137,7 +137,9 @@ public class Client extends ExtendedAgent
 			}
 			
 			if(extension.equals("cpp") || extension.equals("h"))
+			{
 				counter++;
+			}
 		}
 		
 		return counter;

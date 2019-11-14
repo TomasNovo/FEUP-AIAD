@@ -1,11 +1,11 @@
-package logic.Client.Behaviours.Negation;
+package logic.Client.Behaviours.Negotiation;
 
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import logic.Auction.Bid;
 import logic.Client.Client;
-import logic.Client.Behaviours.Negation.SendResponseBehaviour;
+import logic.Client.Behaviours.Negotiation.SendResponseBehaviour;
 
 public class ReceiveNegotiationBehaviour extends Behaviour
 {

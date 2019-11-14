@@ -1,4 +1,4 @@
-package logic.Client.Behaviours.Negation;
+package logic.Client.Behaviours.Negotiation;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
