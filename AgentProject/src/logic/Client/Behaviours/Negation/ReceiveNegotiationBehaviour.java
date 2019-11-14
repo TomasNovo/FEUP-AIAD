@@ -1,10 +1,11 @@
-package logic.Client.Behaviours;
+package logic.Client.Behaviours.Negation;
 
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import logic.Auction.Bid;
 import logic.Client.Client;
+import logic.Client.Behaviours.Negation.SendResponseBehaviour;
 
 public class ReceiveNegotiationBehaviour extends Behaviour
 {
@@ -23,9 +24,12 @@ public class ReceiveNegotiationBehaviour extends Behaviour
 		agent = (Client) myAgent;
 		
 		if(receiveNegotiation() != 0) 
-		{System.out.println("ERROR: CPU: Error receiving negotiation"); block();}
+		{agent.println("ERROR: CPU: Error receiving negotiation"); block();}
 		
-		agent.checkCPUProposal();
+		if(agent.checkCPUProposal())
+			agent.addBehaviour(new SendResponseBehaviour("Negotiation accepted"));
+		else 
+			agent.addBehaviour(new SendResponseBehaviour("Negotiation rejected"));
 			
 	}
 	
@@ -40,8 +44,8 @@ public class ReceiveNegotiationBehaviour extends Behaviour
 		
         if (msg != null)
         {
-        	agent.b = new Bid(agent, msg.getContent() + 's');
-    		System.out.println("Client received: " + msg.getContent());
+        	agent.bcpu = new Bid(agent, msg.getContent() + 's');
+    		agent.println("Client received: " + msg.getContent());
 
             return 0;
         }

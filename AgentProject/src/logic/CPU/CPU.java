@@ -39,7 +39,6 @@ public class CPU extends ExtendedAgent
 		
 		bidIsAcceptable = false;
 		
-		// TODO receive Client's bid by DF
 		b = new Bid(this, "10m");
 		
 		registerDF();
