@@ -22,6 +22,7 @@ public class Client extends ExtendedAgent
 	public String projectPath;
 	public String deadline;
 	public int numberOfProjectFiles;
+	public int numberOfUtilProjectFiles;
 	
 	//initial bid
 	public Bid b;
@@ -45,6 +46,7 @@ public class Client extends ExtendedAgent
 			projectName = args[0].toString();
 			projectPath = Macros.clientProjectPath + "/" + projectName;
 			numberOfProjectFiles = getNumberOfProjectFiles();
+			numberOfUtilProjectFiles = getNumberOfUtilProjectFiles();
 			
             deadline = args[1].toString();
             
@@ -118,5 +120,27 @@ public class Client extends ExtendedAgent
 	public int getNumberOfProjectFiles()
 	{
 		return new File(this.projectPath).list().length;
+	}
+	
+	public int getNumberOfUtilProjectFiles()
+	{
+		int counter = 0;
+		String[] f = new File(this.projectPath).list();
+		String extension = "cpp";
+
+		for(int i = 0; i < f.length; i++)
+		{
+			int j = f[i].lastIndexOf('.');
+			if (j > 0) 
+			{
+			    extension = f[i].substring(j+1);
+			}
+			
+			if(extension.equals("cpp") || extension.equals("h"))
+				counter++;
+		}
+		
+		return counter;
+		
 	}
 }
