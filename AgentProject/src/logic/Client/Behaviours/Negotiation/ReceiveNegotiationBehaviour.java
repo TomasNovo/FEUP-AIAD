@@ -3,8 +3,10 @@ package logic.Client.Behaviours.Negotiation;
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import logic.Macros;
 import logic.Auction.Bid;
 import logic.Client.Client;
+import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
 import logic.Client.Behaviours.Negotiation.SendResponseBehaviour;
 
 public class ReceiveNegotiationBehaviour extends Behaviour
@@ -23,17 +25,40 @@ public class ReceiveNegotiationBehaviour extends Behaviour
 	{
 		agent = (Client) myAgent;
 		
-		if(receiveNegotiation() != 0) 
+		String negotiation = receiveNegotiation();
+		
+		if(negotiation.equals("-1"))
 		{agent.println("ERROR: CPU: Error receiving negotiation"); block();}
 		
-		if(agent.checkCPUProposal())
-			agent.addBehaviour(new SendResponseBehaviour("Negotiation accepted"));
-		else 
-			agent.addBehaviour(new SendResponseBehaviour("Negotiation rejected"));
+		else if(negotiation.equals(Macros.deadlineAcceptable)) // deadline aceite
+		{
+			agent.acceptedDeadline = true;
+			agent.addBehaviour(new SendResponseBehaviour("Negotiation accepted"));	
+			block();
+		}
+		else
+		{
+			agent.acceptedDeadline = false;
 			
+			boolean result = agent.checkCPUProposal();
+			
+			System.out.println(result);
+			
+			//negociação
+			if(result)
+			{
+				agent.acceptedNegotiation = true;
+				agent.addBehaviour(new SendResponseBehaviour("Negotiation accepted"));
+			}
+			else 
+			{	agent.acceptedNegotiation = false;
+				agent.addBehaviour(new SendResponseBehaviour("Negotiation rejected"));
+			}
+			block();
+		}	
 	}
 	
-	public int receiveNegotiation()
+	public String receiveNegotiation()
 	{
 		ACLMessage msg = null;
 		
@@ -42,14 +67,22 @@ public class ReceiveNegotiationBehaviour extends Behaviour
 			msg = agent.receive();
 		}
 		
-        if (msg != null)
+        if (msg != null )
         {
-        	agent.bcpu = new Bid(agent, msg.getContent() + 's');
-    		agent.println("Client received: " + msg.getContent());
-
-            return 0;
+        	if(msg.getContent().equals(Macros.deadlineAcceptable))
+        	{
+        		block();
+        		return Macros.deadlineAcceptable;
+        	}
+        	else
+        	{
+        		agent.bcpu = new Bid(agent, msg.getContent() + 's');
+        		agent.println("Client received: " + msg.getContent());
+        	}
+        			
+            return "0";
         }
-        else return -1;
+        else return "-1";
 	}
 	
 

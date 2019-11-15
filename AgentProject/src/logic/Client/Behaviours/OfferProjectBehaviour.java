@@ -20,6 +20,7 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.ProjectInfo;
 import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
+import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 import logic.Client.Client;;
 
 public class OfferProjectBehaviour extends Behaviour
@@ -40,7 +41,8 @@ public class OfferProjectBehaviour extends Behaviour
 		
 		publishProject();
 		
-		agent.addBehaviour(new ReceiveCompiledFilesBehaviour());
+		agent.addBehaviour(new ReceiveNegotiationBehaviour());
+//		agent.addBehaviour(new ReceiveCompiledFilesBehaviour());
 	}
 	
 	public boolean publishProject()
@@ -85,11 +87,6 @@ public class OfferProjectBehaviour extends Behaviour
                 	infos[randomCPU].toBeCompiled.add(i);
             	}
             }
-            
-            /* TODO: Calculate deadline
-             * 
-             * 
-             */
     		
     		for (int i = 0; i < infos.length; i++)
     		{

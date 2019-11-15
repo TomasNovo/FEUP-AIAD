@@ -24,6 +24,9 @@ public class Client extends ExtendedAgent
 	public int numberOfProjectFiles;
 	public int numberOfUtilProjectFiles;
 	
+	public boolean acceptedDeadline = false; 
+	public boolean acceptedNegotiation = false; 
+	
 	//initial bid
 	public Bid b;
 	public float tolerance;
@@ -50,16 +53,13 @@ public class Client extends ExtendedAgent
 			
             deadline = args[1].toString();
             
-            this.setTolerance(true, 0);
+            this.setTolerance(false, 5);
     		
             b = new Bid(this, deadline);
         
     		addBehaviour(new OfferProjectBehaviour());
             
         }
-	
-
-        //addBehaviour(new ReceiveNegotiationBehaviour());
 	}
 	
 	/*
@@ -89,11 +89,9 @@ public class Client extends ExtendedAgent
 	{		
 	  if(bcpu.getDeadlineInSeconds() < b.getDeadlineInSeconds() + this.getToleranceOfDeadline())
 	  {
-		  this.println("New deadline accepted");
 		  return true;
 	  }
 			
-	  	this.println("New deadline rejected");
 		return false;
 	}
 	

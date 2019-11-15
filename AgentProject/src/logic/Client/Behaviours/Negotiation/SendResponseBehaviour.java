@@ -18,6 +18,7 @@ import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
 import logic.Macros;
 import logic.Client.Client;
+import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
 
 public class SendResponseBehaviour extends Behaviour{
 
@@ -38,6 +39,12 @@ public class SendResponseBehaviour extends Behaviour{
 		
 		if(sendResponse() != 0)
 			agent.errorPrintln("Error sending response");
+		
+		if(agent.acceptedDeadline || agent.acceptedNegotiation)
+			agent.addBehaviour(new ReceiveCompiledFilesBehaviour());
+			
+		
+		else return;
 	}
 	
 	public int sendResponse()

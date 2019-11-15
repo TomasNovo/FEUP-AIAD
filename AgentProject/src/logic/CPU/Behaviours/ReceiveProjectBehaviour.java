@@ -12,6 +12,8 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.ProjectInfo;
 import logic.CPU.Behaviours.CompileProjectBehaviour;
+import logic.CPU.Behaviours.Negotiation.SendNegotiationBehaviour;
+import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 import logic.CPU.CPU;
 
 
@@ -32,9 +34,18 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	public void onTick()
 	{
 		if (selectProject())
-			agent.addBehaviour(new CompileProjectBehaviour(pathToFolder));
+		{
+			/* TODO: Handle deadline negociation
+			 * 
+			 */
+			agent.addBehaviour(new SendNegotiationBehaviour(pathToFolder));
+			
+		}
+			
 //		else
 //			agent.println("No project");
+		
+		
 
 	}
 	
@@ -46,13 +57,6 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 		ACLMessage msg = this.myAgent.blockingReceive();
 		agent.clientAID = msg.getSender();
 		ProjectInfo info = ProjectInfo.deserialize(msg.getByteSequenceContent());
-		
-		
-		
-		/* TODO: Handle deadline negociation
-		 * 
-		 */
-		
 		
 		if (!saveProject(info))
 		{

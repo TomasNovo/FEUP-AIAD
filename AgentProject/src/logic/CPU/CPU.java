@@ -39,6 +39,8 @@ public class CPU extends ExtendedAgent
 	
 	public ArrayList<Double> compilationTimes = new ArrayList<Double>(Arrays.asList(10.0, 12.0, 11.0)); 
 	
+	public boolean acceptableDeadline = false;
+	
 	@Override
 	protected void setup()
 	{
@@ -56,7 +58,6 @@ public class CPU extends ExtendedAgent
 		new File("CPU-Projects").mkdirs();
 		
 		addBehaviour(new ReceiveProjectBehaviour(this));
-		//addBehaviour(new SendNegotiationBehaviour());
 	}
 	
 	// Returns average compilation times if exist

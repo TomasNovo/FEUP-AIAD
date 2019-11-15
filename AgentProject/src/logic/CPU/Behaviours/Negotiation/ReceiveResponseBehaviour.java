@@ -4,16 +4,20 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import logic.Auction.Bid;
 import logic.CPU.CPU;
+import logic.CPU.Behaviours.CompileProjectBehaviour;
+import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
 
 public class ReceiveResponseBehaviour extends Behaviour
 {
 
 	CPU agent;	
 	boolean received = false;
+	String pathToFolder;
 	
-	public ReceiveResponseBehaviour()
+	
+	public ReceiveResponseBehaviour(String p)
 	{
-		
+		pathToFolder = p;
 	}
 	
 	@Override
@@ -21,12 +25,18 @@ public class ReceiveResponseBehaviour extends Behaviour
 	{
 		agent = (CPU) myAgent;
 		
-		if(receiveResponse() == -1) 
-		{agent.errorPrintln("ERROR: CPU: Error receiving negotiation"); block();}
+		String response = receiveResponse();
+		
+		if(response.equals("-1")) 
+			{agent.errorPrintln("ERROR: CPU: Error receiving negotiation"); block();}
+		else if(response.equals("0"))
+			agent.addBehaviour(new CompileProjectBehaviour(pathToFolder));
+		else
+			agent.println("Negotiation is rejected! #TODO");
 		
 	}
 	
-	public int receiveResponse()
+	public String receiveResponse()
 	{
 		ACLMessage msg = null;
 		
@@ -41,15 +51,15 @@ public class ReceiveResponseBehaviour extends Behaviour
 
             if(msg.getContent().equals("Negotiation accepted"))
     		{
-            	return 0;
+            	return "0";
     		}
             else if(msg.getContent().equals("Negotiation rejected"))
     		{
-            	return 1;
+            	return "1";
     		}
         }
         
-        return -1;
+        return "-1";
 	}
 	
 

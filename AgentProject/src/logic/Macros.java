@@ -13,4 +13,5 @@ public class Macros
 	public static final String clientProjectPath = "Client-Projects";
 	public static final String cpuProjectPath = "CPU-Projects";
 
+	public static final String deadlineAcceptable = "Deadline is acceptable";
 }

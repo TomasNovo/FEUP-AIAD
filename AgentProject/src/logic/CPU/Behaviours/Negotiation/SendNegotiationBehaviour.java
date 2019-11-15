@@ -19,16 +19,18 @@ import logic.CompilationFile;
 import logic.Macros;
 import logic.CPU.CPU;
 import logic.Client.Client;
+import logic.CPU.Behaviours.CompileProjectBehaviour;
 import logic.CPU.Behaviours.Negotiation.ReceiveResponseBehaviour;
 
 public class SendNegotiationBehaviour extends Behaviour
 {
 	CPU agent;	
 	boolean sentClient = false;
+	String pathToFolder;
 	
-	public SendNegotiationBehaviour()
+	public SendNegotiationBehaviour(String p)
 	{
-		
+		this.pathToFolder = p;
 	}
 	
 	@Override
@@ -42,19 +44,26 @@ public class SendNegotiationBehaviour extends Behaviour
 				return;
 		}
 		
-		agent.addBehaviour(new ReceiveResponseBehaviour());
+		agent.addBehaviour(new ReceiveResponseBehaviour(pathToFolder));
 
 	}
 	
 	public String calculateNewProposedDeadline()
 	{
-		// chamar função que define incremento do proposed deadline
+		float average = agent.getAverageCPUCompilationTimes();
 		
 		int d = agent.b.getDeadlineInSeconds();
 
-		d += 120;
+		
+		// TODO calculate new deadline
+		/*if(average <= d/2)
+		{
+			agent.acceptableDeadline = true;
+			return Macros.deadlineAcceptable;
+		}*/
 		
 		// incrementar D com valor da funçao
+		d += 120;
 		
 		return Integer.toString(d);
 	}
