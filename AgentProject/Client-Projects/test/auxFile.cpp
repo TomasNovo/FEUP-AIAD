@@ -1,5 +1,6 @@
 #include "auxFile.h"
 
+//Should be 45
 int count()
 {
 	int res = 0;
