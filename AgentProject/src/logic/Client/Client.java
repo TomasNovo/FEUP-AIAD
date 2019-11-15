@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
+import jade.core.AID;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
+import logic.ProjectInfo;
 import logic.Auction.Bid;
 import logic.Client.Behaviours.OfferProjectBehaviour;
 import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
@@ -16,11 +18,10 @@ import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 public class Client extends ExtendedAgent
 {
 	public int id = 0;
-	public ArrayList<CompilationFile> files;
-	public DFAgentDescription[] CPUs;
+	public ProjectInfo info;
+	public ArrayList<DFAgentDescription> cpus;
 	public String projectName;
 	public String projectPath;
-	public String deadline;
 	public int numberOfProjectFiles;
 	public int numberOfUtilProjectFiles;
 	
@@ -28,7 +29,7 @@ public class Client extends ExtendedAgent
 	public boolean acceptedNegotiation = false; 
 	
 	//initial bid
-	public Bid b;
+	public Bid deadline;
 	public float tolerance;
 	
 	//received bid 
@@ -51,12 +52,10 @@ public class Client extends ExtendedAgent
 			numberOfProjectFiles = getNumberOfProjectFiles();
 			numberOfUtilProjectFiles = getNumberOfUtilProjectFiles();
 			
-            deadline = args[1].toString();
+            deadline = new Bid(this, args[1].toString());
             
             this.setTolerance(false, 5);
-    		
-            b = new Bid(this, deadline);
-        
+    		        
     		addBehaviour(new OfferProjectBehaviour());
             
         }
@@ -87,7 +86,7 @@ public class Client extends ExtendedAgent
 	
 	public boolean checkCPUProposal()
 	{		
-	  if(bcpu.getDeadlineInSeconds() < b.getDeadlineInSeconds() + this.getToleranceOfDeadline())
+	  if (bcpu.getDeadlineInMilliSeconds() < deadline.getDeadlineInMilliSeconds() + this.getToleranceOfDeadline())
 	  {
 		  return true;
 	  }
@@ -112,7 +111,7 @@ public class Client extends ExtendedAgent
 	 */
 	public float getToleranceOfDeadline()
 	{
-		return this.tolerance * this.b.getDeadlineInSeconds();
+		return this.tolerance * this.deadline.getDeadlineInMilliSeconds();
 	}
 	
 	public int getNumberOfProjectFiles()
@@ -142,5 +141,16 @@ public class Client extends ExtendedAgent
 		
 		return counter;
 		
+	}
+	
+	public int searchCPU(AID cpuName)
+	{
+		for (int i = 0; i < cpus.size(); i++)
+		{
+			if (cpus.get(i).getName().equals(cpuName))
+				return i;
+		}
+		
+		return -1;
 	}
 }

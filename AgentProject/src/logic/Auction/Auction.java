@@ -62,7 +62,7 @@ public class Auction {
 		
 		for(int i = 0; i < this.bids.size(); i++)
 		{
-		     if(this.bids.get(i).getDeadlineInSeconds() < highest.getDeadlineInSeconds())
+		     if(this.bids.get(i).getDeadlineInMilliSeconds() < highest.getDeadlineInMilliSeconds())
 		     {
 		    	 highest = this.bids.get(i);
 		     }

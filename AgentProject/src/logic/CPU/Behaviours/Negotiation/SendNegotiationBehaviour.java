@@ -26,11 +26,10 @@ public class SendNegotiationBehaviour extends Behaviour
 {
 	CPU agent;	
 	boolean sentClient = false;
-	String pathToFolder;
 	
-	public SendNegotiationBehaviour(String p)
+	public SendNegotiationBehaviour()
 	{
-		this.pathToFolder = p;
+		
 	}
 	
 	@Override
@@ -38,34 +37,14 @@ public class SendNegotiationBehaviour extends Behaviour
 	{
 		agent = (CPU) myAgent;
 		
-		if(!agent.bidIsAcceptable)
+		if (agent.bidIsAcceptable)
 		{
 			if(sendClientProposal() != 0)
 				return;
 		}
 		
-		agent.addBehaviour(new ReceiveResponseBehaviour(pathToFolder));
+		agent.addBehaviour(new ReceiveResponseBehaviour(agent.projectPath));
 
-	}
-	
-	public String calculateNewProposedDeadline()
-	{
-		float average = agent.getAverageCPUCompilationTimes();
-		
-		int d = agent.b.getDeadlineInSeconds();
-
-		
-		// TODO calculate new deadline
-		/*if(average <= d/2)
-		{
-			agent.acceptableDeadline = true;
-			return Macros.deadlineAcceptable;
-		}*/
-		
-		// incrementar D com valor da funçao
-		d += 120;
-		
-		return Integer.toString(d);
 	}
 	
 	public int sendClientProposal()
@@ -78,6 +57,35 @@ public class SendNegotiationBehaviour extends Behaviour
 		
 		return 0;
 	}
+	
+	public String calculateNewProposedDeadline()
+	{
+		double average = agent.getAverageCPUCompilationTimes();
+		
+		int deadline = agent.info.deadline.getDeadlineInMilliSeconds();
+		int numBytes = agent.info.calculateCompileNumBytes();
+		double predictedCompilationTime = numBytes/average;
+		int newDeadLine;
+		
+		if (average == 0.0 || predictedCompilationTime <= deadline)
+		{
+			// ACCEPT
+			agent.acceptableDeadline = true;
+			return Macros.deadlineAcceptable;
+		}
+		else
+		{
+			// Calculate new deadline (Caculates the new deadline by selecting a uniform random time between -15% to +15% of the predictedCompilationTime 
+			
+			double variance = 0.15;
+			newDeadLine = (int)((Math.random()-0.5) * variance * 2 * predictedCompilationTime + predictedCompilationTime) * 1000; 
+		}
+		
+		
+		return new Integer(newDeadLine).toString();
+	}
+	
+
 	
 	
 	@Override

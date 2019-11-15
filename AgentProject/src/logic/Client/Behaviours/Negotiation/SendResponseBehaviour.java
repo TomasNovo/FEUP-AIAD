@@ -22,13 +22,15 @@ import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
 
 public class SendResponseBehaviour extends Behaviour{
 
-	Client agent;	
+	Client agent;
 	String message;
+	AID cpuName;
 	boolean sent = false;
 	
-	public SendResponseBehaviour(String m)
+	public SendResponseBehaviour(String m, AID cpuName)
 	{
 		this.message = m;
+		this.cpuName = cpuName;
 	}
 	
 	@Override
@@ -52,7 +54,7 @@ public class SendResponseBehaviour extends Behaviour{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent(message);
 		agent.println("Client response: " + msg.getContent());
-		msg.addReceiver(new AID("CPU", AID.ISLOCALNAME));
+		msg.addReceiver(this.cpuName);
 		agent.send(msg);
 		
 		return 0;

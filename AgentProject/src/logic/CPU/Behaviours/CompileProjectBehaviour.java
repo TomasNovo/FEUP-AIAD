@@ -13,6 +13,8 @@ import logic.CPU.CPU;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
+import logic.Pair;
+import logic.Auction.Bid;
 import logic.CPU.Behaviours.SendCompilationFilesBehaviour;
 
 public class CompileProjectBehaviour extends Behaviour
@@ -30,35 +32,30 @@ public class CompileProjectBehaviour extends Behaviour
 	public void action()
 	{
 		agent = (CPU) myAgent;
-		
-		cf = null;
-		
-		if (agent.files.size() == 0)
-			return;
 
-        for (int i = 0; i < agent.files.size(); i++)
+        for (int i = 0; i < agent.info.toBeCompiled.size(); i++)
         {
-        	cf = agent.files.get(i);
+        	int index = agent.info.toBeCompiled.get(i);
+        	cf = agent.info.files.get(index);
         	
         	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
         	{
         		saveCompilationTime();
         		
         		if (!cf.compile())
-            	{
-            		((ExtendedAgent)myAgent).errorPrintln("Failed to compile " + cf.getFilename());
-            		return;
-            	}
+            		agent.errorPrintln("Failed to compile " + cf.getFilename());
+        		else
+            		agent.println("Successfully compiled " + cf.getFilename());
         	}
 		}
         
-        agent.println("Successfully compiled!");
+        agent.println("Successfully compiled project \"" + agent.info.name + "\"!");
         agent.addBehaviour(new SendCompilationFilesBehaviour());
 	}
 
 	public void saveCompilationTime()
 	{
-		agent.compilationTimes.add(cf.getCompilationTime());
+		agent.compilationTimes.add(new Pair<Double, Integer>(cf.getCompilationTime(), new Integer(cf.text.length())));
 	}
 	
 	@Override

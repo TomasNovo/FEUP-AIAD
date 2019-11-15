@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import jade.core.AID;
@@ -19,6 +20,7 @@ import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
 import logic.Macros;
 import logic.ProjectInfo;
+import logic.Auction.Bid;
 import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
 import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 import logic.Client.Client;;
@@ -37,23 +39,20 @@ public class OfferProjectBehaviour extends Behaviour
 	public void action()
 	{
 		agent = (Client) myAgent;
-		agent.files = new ArrayList<CompilationFile>();
 		
 		publishProject();
-		
-		agent.addBehaviour(new ReceiveNegotiationBehaviour());
-//		agent.addBehaviour(new ReceiveCompiledFilesBehaviour());
 	}
 	
 	public boolean publishProject()
 	{		
-		ProjectInfo baseInfo = new ProjectInfo();
-		baseInfo.name = agent.projectName;
-		baseInfo.deadline = agent.deadline;
-
+		agent.info = new ProjectInfo();
+		agent.info.name = agent.projectName;
+		agent.info.deadline = agent.deadline;
+		
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(agent.projectPath)))
         {
         	// Add files to agent and to info
+    		int fileIndex = 0;
             for (Path child : dirStream)
             {
             	String filename = child.toFile().getName();
@@ -62,38 +61,52 @@ public class OfferProjectBehaviour extends Behaviour
             		CompilationFile cf = new CompilationFile(child.toFile());
             		
             		if (filename.endsWith(Macros.codeFileExtension))
-            			agent.files.add(cf);
+                		agent.info.toBeCompiled.add(new Integer(fileIndex));
             		
-            		baseInfo.files.add(cf);
+            		agent.info.files.add(cf);
+            		fileIndex++;
             	}
     		}
             
-            baseInfo.timestamp = new Long(System.currentTimeMillis());
-            DFAgentDescription[] cpus = agent.searchDF("CPU");
-            ProjectInfo[] infos = new ProjectInfo[cpus.length];
+            agent.info.timestamp = new Long(System.currentTimeMillis());
+            agent.cpus = new ArrayList<DFAgentDescription>(Arrays.asList(agent.searchDF("CPU")));
+            ArrayList<ProjectInfo> infos = new ArrayList<ProjectInfo>();
             
             // Initialize ProjectInfos, one for each CPU
-            for (int i = 0; i < infos.length; i++)
+            for (int i = 0; i < agent.cpus.size(); i++)
             {
-            	infos[i] = baseInfo.Clone();
+            	infos.add(agent.info.Clone());
+            	infos.get(i).toBeCompiled = new ArrayList<Integer>();
             }
             
             // Randomly assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp)
-            for (int i = 0; i < baseInfo.files.size(); i++)
+            // TODO: Balance this random assignment
+            for (int i = 0; i < agent.info.files.size(); i++)
             {
-            	if (baseInfo.files.get(i).filename.endsWith(Macros.codeFileExtension))
+            	if (agent.info.files.get(i).filename.endsWith(Macros.codeFileExtension))
             	{            		
-                	int randomCPU = (int)(Math.random() * infos.length);	
-                	infos[randomCPU].toBeCompiled.add(i);
+                	int randomCPU = (int)(Math.random() * infos.size());	
+                	infos.get(randomCPU).toBeCompiled.add(i);
             	}
             }
     		
-    		for (int i = 0; i < infos.length; i++)
+    		for (int i = 0; i < infos.size(); i++)
     		{
-    			DFAgentDescription dfad = cpus[i];
+    			DFAgentDescription dfad = agent.cpus.get(i);
     			AID cpuName = dfad.getName();
     			
-    			sendProjectInfo(cpuName, infos[i]);
+    			if (infos.get(i).toBeCompiled.size() == 0)
+    			{
+    				agent.cpus.remove(i);
+    				infos.remove(i);
+    				i--;
+    				continue;    				
+    			}
+    			
+    			infos.get(i).deadline = calculateDeadline(infos.get(i));
+    			
+    			sendProjectInfo(cpuName, infos.get(i));
+    			agent.addBehaviour(new ReceiveNegotiationBehaviour());
     		}
     		
         }
@@ -112,6 +125,15 @@ public class OfferProjectBehaviour extends Behaviour
 		msg.addReceiver(cpuName);
 		msg.setByteSequenceContent(info.serialize());
 		agent.send(msg);
+	}
+	
+	private Bid calculateDeadline(ProjectInfo info)
+	{
+		int projectNumBytes = agent.info.calculateCompileNumBytes();
+		int proposalNumBytes = info.calculateCompileNumBytes();
+		int estimatedCompilationTime = (int)((double)agent.deadline.getDeadlineInMilliSeconds() / (double)projectNumBytes * (double)proposalNumBytes);
+		
+		return new Bid(estimatedCompilationTime + "ms");
 	}
 	
 	@Override

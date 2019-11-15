@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
+import logic.CompiledProject;
+import logic.CompiledProjectErrorType;
 import logic.Macros;
 import logic.Client.Client;
 import logic.Client.Behaviours.RemoveProjectBehaviour;
@@ -31,47 +33,58 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 	public void action()
 	{
 		agent = (Client) myAgent;
-
-		for	(int i = 0; i < agent.files.size(); i++) // Iterates through every file to receive the binary
+		boolean successfulProject = true;
+		
+		for	(int i = 0; i < agent.cpus.size(); i++) // Iterates through every file to receive the binary
 		{
 			ACLMessage msg = this.myAgent.blockingReceive();
-			String filename = msg.getUserDefinedParameter("filename");
-			
-			boolean found = false;
-			
-			for	(int j = 0; j < agent.files.size(); j++)
-			{
-				if (agent.files.get(j).getFilename().equals(filename)) // Sets the binary to the respective CompilationFile
-				{
-					CompilationFile cf = agent.files.get(i);
-					cf.setBinary(msg.getByteSequenceContent());
-					agent.files.set(j, cf);
-					
-					if (!saveBinary(cf))
-					{
-						agent.errorPrintln("Failed to save binary!");
-						return;
-					}
-					
-					projectFiles.add(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension);
+			CompiledProject cp = CompiledProject.deserialize(msg.getByteSequenceContent());
 
-					
-					
-					found = true;
-					break;
-				}
+			if (cp.errorType == CompiledProjectErrorType.COMPILATIONERROR)
+			{
+				agent.errorPrintln("CPU " + msg.getSender() + " generated a compilation error!");
+				successfulProject = false;
+				continue;
 			}
 			
-			if (!found)
+			if (cp.errorType == CompiledProjectErrorType.DEADLINEEXCEEDED)
 			{
-				agent.errorPrintln("Failed to find respective CompilationFile!");
-				return;
+				agent.errorPrintln("CPU " + msg.getSender() + " exceeded the deadline!");
+				successfulProject = false;
+				continue;
+			}
+			
+			// Iterate compiledFiles and save the binary on a successful CompiledProject
+			for (int j = 0; j < cp.compiledFiles.size(); j++)
+			{
+				String filename = cp.compiledFiles.get(j).first;
+				int fileIndex = searchFile(filename);
+				if (fileIndex == -1)
+				{
+					agent.errorPrintln("Failed to find respective CompilationFile!");
+					continue;
+				}
+				
+				CompilationFile cf = agent.info.files.get(fileIndex);
+				cf.setBinary(cp.compiledFiles.get(j).second);
+				
+				if (!saveBinary(cf))
+				{
+					agent.errorPrintln("Failed to save binary!");
+					continue;
+				}
+				
+				projectFiles.add(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension);
 			}
 		}
 		
-		agent.println("Successfully received compilation files");
-		linkProject();
-		agent.addBehaviour(new RemoveProjectBehaviour());
+		if (successfulProject)
+		{
+			agent.println("Successfully received compilation files");
+			linkProject();			
+		}
+		else
+			agent.errorPrintln("Failed to receive all compiled files successfully from CPUs, not linking.");
 	}
 	
 	public boolean saveBinary(CompilationFile cf)
@@ -87,6 +100,17 @@ public class ReceiveCompiledFilesBehaviour extends Behaviour
 		}
 		
 		return true;
+	}
+	
+	private int searchFile(String filename)
+	{
+		for	(int i = 0; i < agent.info.files.size(); i++)
+		{
+			if (agent.info.files.get(i).getFilename().equals(filename)) // Sets the binary to the respective CompilationFile
+				return i;
+		}
+		
+		return -1;
 	}
 	
 	public boolean linkProject()

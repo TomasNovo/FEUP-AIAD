@@ -4,7 +4,9 @@ import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Client.Client;
 
-public class Bid {
+public class Bid implements java.io.Serializable  
+{
+	private static final long serialVersionUID = -888659286753456621L;
 
 	private final ExtendedAgent	 bidder;
 	
@@ -14,9 +16,16 @@ public class Bid {
 	private final String deadline;
 	
 	private int numberOfUnit;
-	private char typeOfUnit;
+	private String typeOfUnit;
 	
-	private int deadlineInSeconds = 0;
+	private int deadlineInMilliSeconds = 0;
+	
+	public Bid(String d)
+	{
+		this.bidder = null;
+		this.deadline = d;
+		parseDeadline();
+	}
 	
 	public Bid(ExtendedAgent b, String d)
 	{
@@ -35,32 +44,36 @@ public class Bid {
 		return this.deadline;
 	}
 	
-	public int getDeadlineInSeconds()
+	public int getDeadlineInMilliSeconds()
 	{
-		return this.deadlineInSeconds;
+		return this.deadlineInMilliSeconds;
 	}
 	
 	public void parseDeadline()
-	{
-		this.numberOfUnit = Integer.parseInt(deadline.substring(0, this.deadline.length() - 1));
-		this.typeOfUnit = deadline.substring(this.deadline.length() - 1, this.deadline.length()).charAt(0);
-		
-		switch(typeOfUnit)
+	{		
+		if (deadline.endsWith(Macros.milliseconds))
 		{
-			case Macros.hours:
-				this.deadlineInSeconds = this.numberOfUnit * 3600;
-				break;
-				
-			case Macros.minutes:
-				this.deadlineInSeconds = this.numberOfUnit * 60;
-				break;
-				
-			case Macros.seconds:
-				this.deadlineInSeconds = this.numberOfUnit;
-				break;
-				
-			default: break;
+			this.numberOfUnit = Integer.parseInt(deadline.substring(0, this.deadline.length() - 2));
+			this.deadlineInMilliSeconds = this.numberOfUnit;
+			this.typeOfUnit = Macros.milliseconds;
 		}
-	
+		else if (deadline.endsWith(Macros.hours))
+		{
+			this.numberOfUnit = Integer.parseInt(deadline.substring(0, this.deadline.length() - 1));
+			this.deadlineInMilliSeconds = this.numberOfUnit * 60 * 60 * 1000;
+			this.typeOfUnit = Macros.hours;
+		}
+		else if (deadline.endsWith(Macros.minutes))
+		{
+			this.numberOfUnit = Integer.parseInt(deadline.substring(0, this.deadline.length() - 1));
+			this.deadlineInMilliSeconds = this.numberOfUnit * 60 * 1000;
+			this.typeOfUnit = Macros.minutes;
+		}
+		else if (deadline.endsWith(Macros.seconds))
+		{
+			this.numberOfUnit = Integer.parseInt(deadline.substring(0, this.deadline.length() - 1));
+			this.deadlineInMilliSeconds = this.numberOfUnit * 1000;
+			this.typeOfUnit = Macros.seconds;
+		}
 	}
 }

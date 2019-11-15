@@ -11,13 +11,14 @@ import java.util.Iterator;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import logic.Auction.Bid;
 
 public class ProjectInfo implements java.io.Serializable
 {
 	private static final long serialVersionUID = 8401965560371787246L;
 	
 	public String name;
-	public String deadline;
+	public Bid deadline;
 	public Long timestamp;
 	
 	public ArrayList<CompilationFile> files;
@@ -29,7 +30,7 @@ public class ProjectInfo implements java.io.Serializable
 		toBeCompiled = new ArrayList<Integer>();
 	}
 	
-	public ProjectInfo(String name, String deadline, Long timestamp, ArrayList<CompilationFile> files)
+	public ProjectInfo(String name, Bid deadline, Long timestamp, ArrayList<CompilationFile> files)
 	{
 		this.name = name;
 		this.deadline = deadline;
@@ -55,6 +56,19 @@ public class ProjectInfo implements java.io.Serializable
 		}
 		
 		return info;
+	}
+	
+	public int calculateCompileNumBytes()
+	{
+		int sumBytes = 0;
+		
+		for (int i = 0; i < toBeCompiled.size(); i++)
+		{
+			int index = toBeCompiled.get(i);
+			sumBytes += files.get(index).text.length();
+		}
+		
+		return sumBytes;
 	}
 	
 	public ProjectInfo Clone()

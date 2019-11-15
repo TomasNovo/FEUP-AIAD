@@ -12,6 +12,8 @@ import java.util.Scanner;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
+import logic.Pair;
+import logic.ProjectInfo;
 import logic.Auction.Bid;
 import logic.CPU.Behaviours.ReceiveProjectBehaviour;
 import logic.CPU.Behaviours.Negotiation.SendNegotiationBehaviour;
@@ -27,7 +29,6 @@ import jade.core.AID;
 public class CPU extends ExtendedAgent
 {
 	int id = 0;
-	public ArrayList<CompilationFile> files;
 	public String projectPath;
 	
 	public AID clientAID;
@@ -37,9 +38,11 @@ public class CPU extends ExtendedAgent
 	public Bid b;
 	public boolean bidIsAcceptable;
 	
-	public ArrayList<Double> compilationTimes = new ArrayList<Double>(Arrays.asList(10.0, 12.0, 11.0)); 
+	public ArrayList<Pair<Double, Integer>> compilationTimes = new ArrayList<Pair<Double, Integer>>(); 
 	
 	public boolean acceptableDeadline = false;
+	
+	public ProjectInfo info;
 	
 	@Override
 	protected void setup()
@@ -49,10 +52,8 @@ public class CPU extends ExtendedAgent
 		System.out.println("Hey! Its me, " + getAID().getName());
 //		println(Float.toString(this.getAverageCPUCompilationTimes()));
 		
-		bidIsAcceptable = false;
-		
-		b = new Bid(this, "10m");
-		
+		bidIsAcceptable = true;
+				
 		registerDF();
 		
 		new File("CPU-Projects").mkdirs();
@@ -61,34 +62,33 @@ public class CPU extends ExtendedAgent
 	}
 	
 	// Returns average compilation times if exist
-	public float getAverageCPUCompilationTimes()
+	public double getAverageCPUCompilationTimes()
 	{
-		float numberOfTimes = 0;
-		float sum = 0;
+		double sumTimes = 0;
+		double sumBytes = 0;
 		
 		for(int i = 0; i < compilationTimes.size(); i++)
 		{
-			numberOfTimes++;
-			sum += compilationTimes.get(i);
+			sumTimes += compilationTimes.get(i).first;
+			sumBytes += compilationTimes.get(i).second;
 		}
 		
-		return sum/numberOfTimes;
+		if (sumTimes == 0.0)
+			return 0.0;
+		
+		return sumBytes/sumTimes;
 	}
+
 	
 	public void initializeFiles()
 	{
-		this.files = new ArrayList<CompilationFile>();
+		this.info = null;
 	}
 	
 	// Get e Set Methods
 	public int getID()
 	{
 		return this.id;
-	}
-	
-	public ArrayList<CompilationFile> getFiles()
-	{
-		return this.files;
 	}
 	
 	public String getProjectPath()
@@ -111,9 +111,5 @@ public class CPU extends ExtendedAgent
 		return this.clientFolder;
 	}
 	
-	public void removeFile(int index)
-	{
-		files.remove(index);
-	}
 
 }

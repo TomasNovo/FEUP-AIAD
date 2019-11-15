@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import logic.Auction.Bid;
+
 public class CompilationFile implements java.io.Serializable
 {
 	private static final long serialVersionUID = 2062965636861017777L;
@@ -68,9 +70,7 @@ public class CompilationFile implements java.io.Serializable
 	
 	
 	public boolean compile()
-	{	
-		long start = System.nanoTime();
-		
+	{			
 		Process process;
 		try
 		{
@@ -78,30 +78,35 @@ public class CompilationFile implements java.io.Serializable
 			String codePath = path + "/" + filenameNoExtention + Macros.codeFileExtension;
 			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + codePath + "\"";
 			
+			long start = System.nanoTime();
 			process = Runtime.getRuntime().exec(command);
+
+			int returnValue;
+			try
+			{
+				returnValue = process.waitFor();
+			}
+			catch (InterruptedException e)
+			{
+				returnValue = -1;
+			}
+			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			
-			while (process.isAlive())
-			{}
-			
-			
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
 				System.err.println(line);
 			}
 			
-			int returnValue = process.exitValue();
-			
 			this.compilationTime = (System.nanoTime() - start) / (double)1E9;
-
+			
 			if (returnValue != 0)
 			{
 				this.compilationTime = -1;
 				return false;
 			}
 			
-			binary = Files.readAllBytes(Paths.get(binaryPath));			
+			binary = Files.readAllBytes(Paths.get(binaryPath));
 		}
 		catch (IOException e)
 		{
@@ -112,6 +117,7 @@ public class CompilationFile implements java.io.Serializable
 		
 		return true;
 	}
+
 
 	// Set methods
 	public void setBinary(byte[] b)
@@ -160,7 +166,7 @@ public class CompilationFile implements java.io.Serializable
 		return this.compilationTime;
 	}
 	
-	public String serialize()
+	public byte[] serialize()
 	{
 		ByteArrayOutputStream bo = null;
 		try
@@ -175,7 +181,7 @@ public class CompilationFile implements java.io.Serializable
 			e.printStackTrace();
 		}
 		 
-		return bo.toString();
+		return bo.toByteArray();
 	}
 	
 	public static CompilationFile deserialize(byte[] serializedObject)

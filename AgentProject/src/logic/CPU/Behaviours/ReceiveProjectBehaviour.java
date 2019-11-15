@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import logic.CompilationFile;
@@ -17,44 +18,32 @@ import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 import logic.CPU.CPU;
 
 
-public class ReceiveProjectBehaviour extends TickerBehaviour
+public class ReceiveProjectBehaviour extends Behaviour
 {
 	CPU agent;
-	String pathToFolder;
 	ArrayList<ProjectInfo> finishedProjects;
 
 	public ReceiveProjectBehaviour(CPU agent)
 	{
-		super(agent, 1000);
 		this.agent = agent;
 		finishedProjects = new ArrayList<ProjectInfo>();
 	}
 	
 	@Override
-	public void onTick()
+	public void action()
 	{
 		if (selectProject())
 		{
-			/* TODO: Handle deadline negociation
-			 * 
-			 */
-			agent.addBehaviour(new SendNegotiationBehaviour(pathToFolder));
-			
+			agent.println("Received a proposal from \"" + agent.clientAID.getLocalName() + "\" for project \"" + agent.info.name + "\"");
+			agent.addBehaviour(new SendNegotiationBehaviour());
 		}
-			
-//		else
-//			agent.println("No project");
-		
-		
-
 	}
 	
 	
 	public boolean selectProject()
 	{
-		agent.initializeFiles();
-		
 		ACLMessage msg = this.myAgent.blockingReceive();
+		agent.initializeFiles();
 		agent.clientAID = msg.getSender();
 		ProjectInfo info = ProjectInfo.deserialize(msg.getByteSequenceContent());
 		
@@ -70,21 +59,15 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	public boolean saveProject(ProjectInfo info)
 	{
 		String projectName = info.name;
-		pathToFolder = Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName() + "/" + projectName;
+		agent.projectPath = Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName() + "/" + projectName;
 		createProjectFolder();
 		
-		int j = 0;
 		for (int i = 0; i < info.files.size(); i++)
 		{
 			CompilationFile cf = info.files.get(i);
-			cf.path = pathToFolder;
-			
-			if (cf.extension.equals(Macros.codeFileExtension))
-			{
-				agent.files.add(cf);
-			}
+			cf.path = agent.projectPath;
 						
-			File f = new File(pathToFolder + "/" + cf.getFilename());
+			File f = new File(agent.projectPath + "/" + cf.getFilename());
 					
 			try
 			{	
@@ -96,8 +79,9 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 				return false;
 			}
 		}
-
-
+		
+		
+		agent.info = info;
 		return true;
 	}
 	
@@ -114,7 +98,13 @@ public class ReceiveProjectBehaviour extends TickerBehaviour
 	
 	public boolean createProjectFolder()
 	{
-		return new File(pathToFolder).mkdirs();
+		return new File(agent.projectPath).mkdirs();
+	}
+
+	@Override
+	public boolean done()
+	{
+		return true;
 	}	
 	
 }
