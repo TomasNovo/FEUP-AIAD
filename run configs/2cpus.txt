@@ -1,0 +1,1 @@
+-gui Client:logic.Client.Client("test","2s");CPU1:logic.CPU.CPU();CPU2:logic.CPU.CPU();
