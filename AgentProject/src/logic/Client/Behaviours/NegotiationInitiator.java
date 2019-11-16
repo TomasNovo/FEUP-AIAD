@@ -141,7 +141,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 		if (agent.projectFiles.size() == agent.info.toBeCompiled.size())
 		{
 			linkProject();
-			agent.doDelete();			
+			agent.doDelete();
 		}
 	}
 
