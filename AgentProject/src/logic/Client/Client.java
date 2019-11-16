@@ -21,8 +21,6 @@ public class Client extends ExtendedAgent
 	public ArrayList<DFAgentDescription> cpus;
 	public String projectName;
 	public String projectPath;
-	public int numberOfProjectFiles;
-	public int numberOfUtilProjectFiles;
 	
 	public boolean acceptedDeadline = false; 
 	public boolean acceptedNegotiation = false;
@@ -49,8 +47,6 @@ public class Client extends ExtendedAgent
         {
 			projectName = args[0].toString();
 			projectPath = Macros.clientProjectPath + File.separator + projectName;
-			numberOfProjectFiles = getNumberOfProjectFiles();
-			numberOfUtilProjectFiles = getNumberOfUtilProjectFiles();
 			
             deadline = new Bid(this, args[1].toString());
             
@@ -120,35 +116,6 @@ public class Client extends ExtendedAgent
 		return this.tolerance * this.deadline.getDeadlineInMilliSeconds();
 	}
 	
-	public int getNumberOfProjectFiles()
-	{
-		return new File(this.projectPath).list().length;
-	}
-	
-	public int getNumberOfUtilProjectFiles()
-	{
-		int counter = 0;
-		String[] f = new File(this.projectPath).list();
-		String extension = "cpp";
-
-		for(int i = 0; i < f.length; i++)
-		{
-			int j = f[i].lastIndexOf('.');
-			if (j > 0) 
-			{
-			    extension = f[i].substring(j+1);
-			}
-			
-			if(extension.equals("cpp") || extension.equals("h"))
-			{
-				counter++;
-			}
-		}
-		
-		return counter;
-		
-	}
-	
 	public int searchCPU(AID cpuName)
 	{
 		for (int i = 0; i < cpus.size(); i++)
@@ -159,4 +126,5 @@ public class Client extends ExtendedAgent
 		
 		return -1;
 	}
+	
 }

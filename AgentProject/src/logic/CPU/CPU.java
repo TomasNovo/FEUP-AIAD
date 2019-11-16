@@ -34,7 +34,6 @@ public class CPU extends ExtendedAgent
 	public boolean clientFolder;
 	
 	// Negotiation Attributes
-	public Bid b;
 	public boolean bidIsAcceptable;
 	
 	public ArrayList<Pair<Double, Integer>> compilationTimes = new ArrayList<Pair<Double, Integer>>(); 
