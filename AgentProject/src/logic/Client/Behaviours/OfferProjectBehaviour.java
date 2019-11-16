@@ -7,23 +7,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.Property;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
+import logic.Bid;
 import logic.CompilationFile;
 import logic.Macros;
 import logic.ProjectInfo;
-import logic.Auction.Bid;
-import logic.Client.Behaviours.ReceiveCompiledFilesBehaviour;
-import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
-import logic.Client.Client;;
+import logic.Client.Client;
 
 public class OfferProjectBehaviour extends Behaviour
 {
@@ -79,14 +71,20 @@ public class OfferProjectBehaviour extends Behaviour
             	infos.get(i).toBeCompiled = new ArrayList<Integer>();
             }
             
-            // Randomly assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp)
-            // TODO: Balance this random assignment
+            // Randomly assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp). The files are assigned in a way such that no two CPUs differ in the number of files to be compiled by more than 1 (balanced)
+            ArrayList<Integer> unbalanced = new ArrayList<Integer>();
+            initializeUnbalancedArray(unbalanced);
             for (int i = 0; i < agent.info.files.size(); i++)
             {
             	if (agent.info.files.get(i).filename.endsWith(Macros.codeFileExtension))
             	{            		
-                	int randomCPU = (int)(Math.random() * infos.size());	
+                	int unbalancedCPUIndex = (int)(Math.random() * unbalanced.size());
+                	int randomCPU = unbalanced.get(unbalancedCPUIndex);
                 	infos.get(randomCPU).toBeCompiled.add(i);
+                	unbalanced.remove(unbalancedCPUIndex);
+                	
+                	if (unbalanced.size() == 0)
+                        initializeUnbalancedArray(unbalanced);
             	}
             }
     		
@@ -94,20 +92,19 @@ public class OfferProjectBehaviour extends Behaviour
     		{
     			DFAgentDescription dfad = agent.cpus.get(i);
     			AID cpuName = dfad.getName();
-    			
+
     			if (infos.get(i).toBeCompiled.size() == 0)
     			{
     				agent.cpus.remove(i);
     				infos.remove(i);
     				i--;
-    				continue;    				
+    				continue;
     			}
     			
     			infos.get(i).deadline = calculateDeadline(infos.get(i));
-    			
-    			sendProjectInfo(cpuName, infos.get(i));
-    			agent.addBehaviour(new ReceiveNegotiationBehaviour());
-    		}
+    			agent.addBehaviour(new NegotiationInitiator(agent, infos.get(i), cpuName));
+      		}
+    		
     		
         }
 		catch (IOException e)
@@ -119,14 +116,6 @@ public class OfferProjectBehaviour extends Behaviour
 		return true;
 	}
 	
-	private void sendProjectInfo(AID cpuName, ProjectInfo info)
-	{		
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.addReceiver(cpuName);
-		msg.setByteSequenceContent(info.serialize());
-		agent.send(msg);
-	}
-	
 	private Bid calculateDeadline(ProjectInfo info)
 	{
 		int projectNumBytes = agent.info.calculateCompileNumBytes();
@@ -134,6 +123,14 @@ public class OfferProjectBehaviour extends Behaviour
 		int estimatedCompilationTime = (int)((double)agent.deadline.getDeadlineInMilliSeconds() / (double)projectNumBytes * (double)proposalNumBytes);
 		
 		return new Bid(estimatedCompilationTime + "ms");
+	}
+	
+	private void initializeUnbalancedArray(ArrayList<Integer> unbalanced)
+	{
+        for (int i = 0; i < agent.cpus.size(); i++)
+        {
+        	unbalanced.add(i);
+        }
 	}
 	
 	@Override

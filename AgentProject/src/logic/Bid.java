@@ -1,7 +1,5 @@
-package logic.Auction;
+package logic;
 
-import logic.ExtendedAgent;
-import logic.Macros;
 import logic.Client.Client;
 
 public class Bid implements java.io.Serializable  

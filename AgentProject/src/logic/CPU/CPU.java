@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import logic.Bid;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
 import logic.Pair;
 import logic.ProjectInfo;
-import logic.Auction.Bid;
-import logic.CPU.Behaviours.ReceiveProjectBehaviour;
-import logic.CPU.Behaviours.Negotiation.SendNegotiationBehaviour;
+import logic.CPU.Behaviours.NegotiationResponder;
 import jade.core.AID;
 
 /**
@@ -42,8 +41,6 @@ public class CPU extends ExtendedAgent
 	
 	public boolean acceptableDeadline = false;
 	
-	public ProjectInfo info;
-	
 	@Override
 	protected void setup()
 	{
@@ -58,7 +55,7 @@ public class CPU extends ExtendedAgent
 		
 		new File("CPU-Projects").mkdirs();
 		
-		addBehaviour(new ReceiveProjectBehaviour(this));
+		addBehaviour(new NegotiationResponder(this));
 	}
 	
 	// Returns average compilation times if exist
@@ -79,11 +76,6 @@ public class CPU extends ExtendedAgent
 		return sumBytes/sumTimes;
 	}
 
-	
-	public void initializeFiles()
-	{
-		this.info = null;
-	}
 	
 	// Get e Set Methods
 	public int getID()

@@ -14,8 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-import logic.Auction.Bid;
-
 public class CompilationFile implements java.io.Serializable
 {
 	private static final long serialVersionUID = 2062965636861017777L;

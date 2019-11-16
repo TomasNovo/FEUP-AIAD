@@ -11,7 +11,6 @@ import java.util.Iterator;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import logic.Auction.Bid;
 
 public class ProjectInfo implements java.io.Serializable
 {

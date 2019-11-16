@@ -7,8 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import logic.Auction.Bid;
-
 public class CompiledProject implements java.io.Serializable
 {
 	private static final long serialVersionUID = -272036790499164670L;

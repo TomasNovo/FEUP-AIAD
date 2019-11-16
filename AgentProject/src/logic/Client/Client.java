@@ -6,13 +6,12 @@ import java.util.Random;
 
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import logic.Bid;
 import logic.CompilationFile;
 import logic.ExtendedAgent;
 import logic.Macros;
 import logic.ProjectInfo;
-import logic.Auction.Bid;
 import logic.Client.Behaviours.OfferProjectBehaviour;
-import logic.Client.Behaviours.Negotiation.ReceiveNegotiationBehaviour;
 
 
 public class Client extends ExtendedAgent
@@ -26,15 +25,16 @@ public class Client extends ExtendedAgent
 	public int numberOfUtilProjectFiles;
 	
 	public boolean acceptedDeadline = false; 
-	public boolean acceptedNegotiation = false; 
+	public boolean acceptedNegotiation = false;
+	public boolean successfulProject;
 	
 	//initial bid
 	public Bid deadline;
 	public float tolerance;
 	
-	//received bid 
-	public Bid bcpu;
-	
+	public ArrayList<String> projectFiles;
+	public double totalCompilationTime;
+		
 	@Override
 	protected void setup()
 	{
@@ -84,7 +84,7 @@ public class Client extends ExtendedAgent
 		this.println("Tolerance: " + this.tolerance);
 	}
 	
-	public boolean checkCPUProposal()
+	public boolean checkCPUProposal(Bid bcpu, Bid deadline)
 	{		
 	  if (bcpu.getDeadlineInMilliSeconds() < deadline.getDeadlineInMilliSeconds() + this.getToleranceOfDeadline())
 	  {
@@ -92,6 +92,12 @@ public class Client extends ExtendedAgent
 	  }
 			
 		return false;
+	}
+	
+	public void initializeClient()
+	{
+		projectFiles = new ArrayList<String>();
+		totalCompilationTime = 0.0;
 	}
 	
 	/*
