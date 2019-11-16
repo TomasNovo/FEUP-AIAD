@@ -89,7 +89,7 @@ public class CompilationFile implements java.io.Serializable
 				returnValue = -1;
 			}
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
 			while ((line = reader.readLine()) != null)
 			{

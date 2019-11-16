@@ -197,18 +197,22 @@ public class NegotiationInitiator extends ContractNetInitiator
 			Process process;
 			process = Runtime.getRuntime().exec(command);
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			int returnValue;
+			try
+			{
+				returnValue = process.waitFor();
+			}
+			catch (InterruptedException e)
+			{
+				returnValue = -1;
+			}
 			
-			while (process.isAlive())
-			{}
-			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
 				System.err.println(line);
 			}
-			
-			int returnValue = process.exitValue();
 
 			if (returnValue != 0)
 			{
