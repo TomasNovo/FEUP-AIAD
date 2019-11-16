@@ -140,6 +140,8 @@ public class NegotiationInitiator extends ContractNetInitiator
 		{
 			linkProject();
 		}
+		
+		agent.doDelete();
 	}
 
 
