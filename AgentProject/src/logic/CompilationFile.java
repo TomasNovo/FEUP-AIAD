@@ -72,8 +72,8 @@ public class CompilationFile implements java.io.Serializable
 		Process process;
 		try
 		{
-			String binaryPath = path + "/" + filenameNoExtention + Macros.binaryFileExtension;
-			String codePath = path + "/" + filenameNoExtention + Macros.codeFileExtension;
+			String binaryPath = path + File.separator + filenameNoExtention + Macros.binaryFileExtension;
+			String codePath = path + File.separator + filenameNoExtention + Macros.codeFileExtension;
 			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + codePath + "\"";
 			
 			long start = System.nanoTime();

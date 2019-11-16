@@ -104,7 +104,7 @@ public class NegotiationResponder extends ContractNetResponder
 	public boolean saveProject()
 	{
 		String projectName = info.name;
-		agent.projectPath = Macros.cpuProjectPath + "/" + agent.getClientAID().getLocalName() + "/" + projectName;
+		agent.projectPath = Macros.cpuProjectPath + File.separator + agent.getClientAID().getLocalName() + File.separator + projectName;
 		createProjectFolder();
 		
 		for (int i = 0; i < info.files.size(); i++)
@@ -112,7 +112,7 @@ public class NegotiationResponder extends ContractNetResponder
 			CompilationFile cf = info.files.get(i);
 			cf.path = agent.projectPath;
 						
-			File f = new File(agent.projectPath + "/" + cf.getFilename());
+			File f = new File(agent.projectPath + File.separator + cf.getFilename());
 					
 			try
 			{	

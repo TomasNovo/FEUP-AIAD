@@ -48,7 +48,7 @@ public class Client extends ExtendedAgent
 		if(args != null && args.length > 0 && args.length == 2) 
         {
 			projectName = args[0].toString();
-			projectPath = Macros.clientProjectPath + "/" + projectName;
+			projectPath = Macros.clientProjectPath + File.separator + projectName;
 			numberOfProjectFiles = getNumberOfProjectFiles();
 			numberOfUtilProjectFiles = getNumberOfUtilProjectFiles();
 			

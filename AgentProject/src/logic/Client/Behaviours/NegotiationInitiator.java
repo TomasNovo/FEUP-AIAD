@@ -2,6 +2,7 @@ package logic.Client.Behaviours;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -132,7 +133,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 				continue;
 			}
 			
-			agent.projectFiles.add(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension);
+			agent.projectFiles.add(cf.path + File.separator + cf.filenameNoExtention + Macros.binaryFileExtension);
 		}
 		
 		if (agent.projectFiles.size() == agent.info.toBeCompiled.size())
@@ -157,7 +158,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 	{
 		try
 		{
-			Files.write(Paths.get(cf.path + "/" + cf.filenameNoExtention + Macros.binaryFileExtension), cf.getBinary(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			Files.write(Paths.get(cf.path + File.separator + cf.filenameNoExtention + Macros.binaryFileExtension), cf.getBinary(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 		}
 		catch (IOException e)
 		{
@@ -184,7 +185,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 		try
 		{
 			String execName = "main";
-			String command = "g++ -o " + agent.projectPath + "/" + execName;
+			String command = "g++ -o " + agent.projectPath + File.separator + execName;
 			
 			for (int i = 0; i < agent.projectFiles.size(); i++)
 			{
