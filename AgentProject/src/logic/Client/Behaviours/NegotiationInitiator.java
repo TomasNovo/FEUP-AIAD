@@ -103,6 +103,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 		{
 			agent.errorPrintln("CPU \"" + cpuName + "\" generated a compilation error!");
 			agent.successfulProject = false;
+			agent.doDelete();
 			return;
 		}
 		
@@ -110,6 +111,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 		{
 			agent.errorPrintln("CPU \"" + cpuName + "\" exceeded the deadline!");
 			agent.successfulProject = false;
+			agent.doDelete();
 			return;
 		}
 		
@@ -139,9 +141,8 @@ public class NegotiationInitiator extends ContractNetInitiator
 		if (agent.projectFiles.size() == agent.info.toBeCompiled.size())
 		{
 			linkProject();
+			agent.doDelete();			
 		}
-		
-		agent.doDelete();
 	}
 
 
@@ -187,12 +188,14 @@ public class NegotiationInitiator extends ContractNetInitiator
 		try
 		{
 			String execName = "main";
-			String command = "g++ -o " + agent.projectPath + File.separator + execName;
+			String command = "g++ -m64 -o " + agent.projectPath + File.separator + execName;
 			
 			for (int i = 0; i < agent.projectFiles.size(); i++)
 			{
 				command += " " + agent.projectFiles.get(i);
 			}
+			
+			
 			
 			Process process;
 			process = Runtime.getRuntime().exec(command);
