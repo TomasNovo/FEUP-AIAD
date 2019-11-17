@@ -1,0 +1,1 @@
+-gui -platform-id platform1 CPU:logic.CPU.CPU()

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
 
 import jade.core.AID;
 import jade.domain.FIPANames;
@@ -49,8 +50,8 @@ public class NegotiationResponder extends ContractNetResponder
 	
 	protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept)
 	{
-		
     	CompiledProject cp = new CompiledProject(info.deadline);
+    	boolean failed = false;
     	
         for (int i = 0; i < info.toBeCompiled.size(); i++)
         {
@@ -59,17 +60,23 @@ public class NegotiationResponder extends ContractNetResponder
         	
         	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
         	{        		
-        		if (!cf.compile())
-            		agent.errorPrintln("Failed to compile " + cf.getFilename());
-        		else
+        		if (cf.compile())
             		agent.println("Successfully compiled " + cf.getFilename());
+        		else
+        		{
+        			failed = true;
+            		agent.errorPrintln("Failed to compile " + cf.getFilename());        			
+        		}
             	
         		saveCompilationTime(cf);        		
         		cp.addCompiledFile(cf);
         	}
 		}
         
-        agent.println("Successfully compiled project \"" + info.name + "\"!");
+        if (failed)
+        	agent.errorPrintln("Failed to compile project \"" + info.name + "\"!");
+        else
+        	agent.println("Successfully compiled project \"" + info.name + "\" in " + new DecimalFormat("#.00").format(cp.totalCompilationTime) + " seconds");
 		
 		return createCompiledProjectResponse(cp);
 	}
@@ -192,7 +199,7 @@ public class NegotiationResponder extends ContractNetResponder
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
 		msg.setByteSequenceContent(cp.serialize());
-		agent.println("CPU sending INFORM: ");
+		agent.println("CPU sending INFORM: " + "CompiledProject " + info.name);
 		msg.addReceiver(clientName);
 		
 		return msg;

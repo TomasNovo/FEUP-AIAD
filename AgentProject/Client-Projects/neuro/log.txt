@@ -1,0 +1,2 @@
+g++ -std=c++11 -g   -c -o main.o main.cpp
+g++ -std=c++11 -g -o main main.o knn.o point.o 
