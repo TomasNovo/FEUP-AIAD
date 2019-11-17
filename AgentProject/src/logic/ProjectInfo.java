@@ -37,26 +37,6 @@ public class ProjectInfo implements java.io.Serializable
 		this.files = files;
 	}
 	
-	public static ProjectInfo Parse(DFAgentDescription dfad)
-	{
-		ProjectInfo info = new ProjectInfo();
-		ServiceDescription sd = (ServiceDescription) dfad.getAllServices().next();
-		Property p = null;
-
-		for (Iterator it = sd.getAllProperties(); it.hasNext();) // Gets the deadline property of the service and saves it if it is lower than the current one
-		{
-			p = (Property) it.next();
-
-			if (p.getName().equals("ProjectInfo"))
-			{
-				info = (ProjectInfo) p.getValue();
-//				break;
-			}
-		}
-		
-		return info;
-	}
-	
 	public int calculateCompileNumBytes()
 	{
 		int sumBytes = 0;

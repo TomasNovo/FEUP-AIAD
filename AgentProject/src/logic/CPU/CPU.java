@@ -39,6 +39,8 @@ public class CPU extends ExtendedAgent
 	
 	public boolean acceptableDeadline = false;
 	
+	public static final int compilationTimesSize = 15;
+	
 	@Override
 	protected void setup()
 	{

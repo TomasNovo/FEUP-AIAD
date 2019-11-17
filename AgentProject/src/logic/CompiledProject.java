@@ -36,11 +36,9 @@ public class CompiledProject implements java.io.Serializable
 		if ((int)(totalCompilationTime * 1000.0) > deadline.getDeadlineInMilliSeconds())
 		{
 			errorType = CompiledProjectErrorType.DEADLINEEXCEEDED;
-			return;
 		}
 				
-		if (errorType == CompiledProjectErrorType.SUCCESS)
-			compiledFiles.add(new Pair<String, byte[]>(cf.filename, cf.binary));
+		compiledFiles.add(new Pair<String, byte[]>(cf.filename, cf.binary));
 	}
 	
 	public byte[] serialize()

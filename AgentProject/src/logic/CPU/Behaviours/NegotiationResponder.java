@@ -68,7 +68,7 @@ public class NegotiationResponder extends ContractNetResponder
             		agent.errorPrintln("Failed to compile " + cf.getFilename());        			
         		}
             	
-        		saveCompilationTime(cf);        		
+        		saveCompilationTime(cf);       		
         		cp.addCompiledFile(cf);
         	}
 		}
@@ -90,6 +90,9 @@ public class NegotiationResponder extends ContractNetResponder
 	public void saveCompilationTime(CompilationFile cf)
 	{
 		agent.compilationTimes.add(new Pair<Double, Integer>(cf.getCompilationTime(), new Integer(cf.text.length())));
+		
+		if (agent.compilationTimes.size() > CPU.compilationTimesSize)
+			agent.compilationTimes.remove(0);
 	}
 	
 	
@@ -173,7 +176,6 @@ public class NegotiationResponder extends ContractNetResponder
 		int deadline = info.deadline.getDeadlineInMilliSeconds();
 		int numBytes = info.calculateCompileNumBytes();
 		double predictedCompilationTime = numBytes/average * 1000;
-		int newDeadLine;
 		
 		if (average == 0.0 || predictedCompilationTime <= deadline)
 		{
@@ -183,15 +185,13 @@ public class NegotiationResponder extends ContractNetResponder
 		}
 		else
 		{
-			// Calculate new deadline (Caculates the new deadline by selecting a uniform random time between -15% to +15% of the predictedCompilationTime 
-			
+			// Calculate new deadline (Caculates the new deadline by selecting a uniform random time between -15% to +15% of the predictedCompilationTime
 			double variance = 0.15;
-			newDeadLine = (int)((Math.random()-0.5) * variance * 2 * predictedCompilationTime + predictedCompilationTime) * 1000;
+			int newDeadLine = (int)((Math.random()-0.05) * variance * 2 * predictedCompilationTime + predictedCompilationTime);			
 			info.deadline = new Bid(new Integer(newDeadLine).toString() + "ms");
+			agent.println("Received deadline: " + deadline + " ms, proposing " + newDeadLine + "ms");
+			return new Integer(newDeadLine).toString() + "ms";
 		}
-		
-		
-		return new Integer(newDeadLine).toString() + "ms";
 	}
 	
 	private ACLMessage createCompiledProjectResponse(CompiledProject cp)

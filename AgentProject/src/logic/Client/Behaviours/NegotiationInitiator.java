@@ -57,31 +57,41 @@ public class NegotiationInitiator extends ContractNetInitiator
 	{
 		Vector<ACLMessage> newAcceptances = (Vector<ACLMessage>) acceptances;
 		
+		AID cpuName = propose.getSender();
+		int cpuIndex = agent.searchCPU(cpuName);
+		
+		if (cpuIndex == -1)
+		{
+			agent.errorPrintln("This agent shoudln't be responding!");
+			return;
+		}
+		
 		ACLMessage msg = propose.createReply();
-
+		
     	if (propose.getContent().equals(Macros.deadlineAcceptable))
     	{
     		msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
     		newAcceptances.addElement(msg);
+    		agent.println(cpuName.getLocalName() + " accepted the deadline");
     	}
     	else
     	{
     		Bid bcpu = new Bid(agent, propose.getContent());	
-    		agent.println("Client received: " + propose.getContent());
+    		agent.println("Client received PROPOSE from " + cpuName.getLocalName() + ": " + propose.getContent());
 			boolean result = agent.checkCPUProposal(bcpu, info.deadline);
 						
 			if (result)
 			{
 	    		msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 				newAcceptances.addElement(msg);
+	    		agent.println("Client accepted new deadline from " + cpuName.getLocalName());
 			}
 			else 
 			{			
-//				// Remove cpu from list
-//				agent.cpus.remove(cpuIndex);
-				
+				agent.cpus.remove(cpuIndex);
 	    		msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
 				newAcceptances.addElement(msg);
+	    		agent.println("Client rejected new deadline from " + cpuName.getLocalName());
 			}
     	}
 	}
@@ -109,18 +119,16 @@ public class NegotiationInitiator extends ContractNetInitiator
 		
 		if (cp.errorType == CompiledProjectErrorType.COMPILATIONERROR)
 		{
-			agent.errorPrintln("CPU \"" + cpuName.getLocalName() + "\" generated a compilation error!");
+			agent.errorPrintln(cpuName.getLocalName() + " generated a compilation error!");
 			agent.successfulProject = false;
-			agent.cpus.remove(agent.searchCPU(cpuName));
-			return;
+			agent.cpus.remove(cpuIndex);
 		}
 		
 		else if (cp.errorType == CompiledProjectErrorType.DEADLINEEXCEEDED)
 		{
-			agent.errorPrintln("CPU \"" + cpuName.getLocalName() + "\" exceeded the deadline by " + (cp.totalCompilationTime*1000 - cp.deadline.getDeadlineInMilliSeconds())/(double)1000 + " seconds!");
+			agent.errorPrintln(cpuName.getLocalName() + " exceeded the deadline by " + (cp.totalCompilationTime*1000 - cp.deadline.getDeadlineInMilliSeconds())/(double)1000 + " seconds!");
 			agent.successfulProject = false;
-			agent.cpus.remove(agent.searchCPU(cpuName));
-			return;
+			agent.cpus.remove(cpuIndex);
 		}
 		else
 		{
@@ -211,9 +219,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 			{
 				command += " " + agent.projectFiles.get(i);
 			}
-			
-			
-			
+				
 			Process process;
 			process = Runtime.getRuntime().exec(command);
 			

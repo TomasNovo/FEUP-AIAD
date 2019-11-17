@@ -74,7 +74,7 @@ public class OfferProjectBehaviour extends Behaviour
             }
             
             // Assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp)
-            distributeFilesEvenlyBySize();
+            distributeFilesRandomly();
             
     		for (int i = 0; i < infos.size(); i++)
     		{
@@ -173,8 +173,6 @@ public class OfferProjectBehaviour extends Behaviour
         	sum.set(lowestIndex, newSum); // Update sum
         	infos.get(lowestIndex).toBeCompiled.add(fileIndex);
         }
-        
-        int a = 0;
 	}
 	
 	private int findLowestSum(ArrayList<Integer> sum)
