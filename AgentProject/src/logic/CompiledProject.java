@@ -13,8 +13,8 @@ public class CompiledProject implements java.io.Serializable
 
 	public CompiledProjectErrorType errorType;
 	public ArrayList<Pair<String, byte[]>> compiledFiles;
-	private Bid deadline;
-	private double totalCompilationTime = 0.0;
+	public Bid deadline;
+	public double totalCompilationTime = 0.0;
 	
 	public CompiledProject(Bid deadline)
 	{

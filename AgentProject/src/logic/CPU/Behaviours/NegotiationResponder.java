@@ -40,7 +40,7 @@ public class NegotiationResponder extends ContractNetResponder
 		
 		if (selectProject(cfp))
 		{
-			agent.println("Received a proposal from \"" + agent.clientAID.getLocalName() + "\" for project \"" + info.name + "\"");			
+			agent.println("Received a proposal from \"" + clientName.getLocalName() + "\" for project \"" + info.name + "\"");			
 			return createProposeResponse();
 		}
 		
@@ -58,14 +58,13 @@ public class NegotiationResponder extends ContractNetResponder
         	CompilationFile cf = info.files.get(index);
         	
         	if (cf.getBinary() == null && cf.extension.equals(Macros.codeFileExtension)) // Not already compiled code file
-        	{
-        		saveCompilationTime(cf);
-        		
+        	{        		
         		if (!cf.compile())
             		agent.errorPrintln("Failed to compile " + cf.getFilename());
         		else
             		agent.println("Successfully compiled " + cf.getFilename());
             	
+        		saveCompilationTime(cf);        		
         		cp.addCompiledFile(cf);
         	}
 		}
@@ -77,7 +76,7 @@ public class NegotiationResponder extends ContractNetResponder
 	
 	protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject)
 	{
-		agent.errorPrintln("Negotiation from \"" + reject.getSender() + "\"is rejected!");
+		agent.errorPrintln("Negotiation from \"" + reject.getSender().getLocalName() + "\" is rejected!");
 	}
 	
 	
@@ -89,13 +88,18 @@ public class NegotiationResponder extends ContractNetResponder
 	
 	public boolean selectProject(ACLMessage msg)
 	{
-		agent.clientAID = msg.getSender();
 		info = ProjectInfo.deserialize(msg.getByteSequenceContent());
+		
+		if (info == null)
+		{
+			agent.errorPrintln("Failed to receive ProjectInfo");
+			return false;
+		}
 		
 		if (!saveProject())
 		{
 			agent.errorPrintln("Failed to save project " + info.name + "!");
-			return false;			
+			return false;
 		}
 		
 		return true;
@@ -104,7 +108,7 @@ public class NegotiationResponder extends ContractNetResponder
 	public boolean saveProject()
 	{
 		String projectName = info.name;
-		agent.projectPath = Macros.cpuProjectPath + File.separator + agent.getClientAID().getLocalName() + File.separator + projectName;
+		agent.projectPath = Macros.cpuProjectPath + File.separator + clientName.getLocalName() + File.separator + projectName;
 		createProjectFolder();
 		
 		for (int i = 0; i < info.files.size(); i++)
@@ -161,7 +165,7 @@ public class NegotiationResponder extends ContractNetResponder
 		
 		int deadline = info.deadline.getDeadlineInMilliSeconds();
 		int numBytes = info.calculateCompileNumBytes();
-		double predictedCompilationTime = numBytes/average;
+		double predictedCompilationTime = numBytes/average * 1000;
 		int newDeadLine;
 		
 		if (average == 0.0 || predictedCompilationTime <= deadline)

@@ -30,7 +30,6 @@ public class CPU extends ExtendedAgent
 	int id = 0;
 	public String projectPath;
 	
-	public AID clientAID;
 	public boolean clientFolder;
 	
 	// Negotiation Attributes
@@ -45,7 +44,7 @@ public class CPU extends ExtendedAgent
 	{
 		super.setup();
 		
-		System.out.println("Hey! Its me, " + getAID().getName());
+//		System.out.println("Hey! Its me, " + getAID().getName());
 //		println(Float.toString(this.getAverageCPUCompilationTimes()));
 		
 		bidIsAcceptable = true;
@@ -86,17 +85,7 @@ public class CPU extends ExtendedAgent
 	{
 		return this.projectPath;
 	}
-	
-	public void setClientAID(AID aid)
-	{
-		this.clientAID = aid;
-	}
-	
-	public AID getClientAID()
-	{
-		return this.clientAID;
-	}
-	
+
 	public boolean getClientFolder()
 	{
 		return this.clientFolder;

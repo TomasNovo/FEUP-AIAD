@@ -22,8 +22,6 @@ public class Client extends ExtendedAgent
 	public String projectName;
 	public String projectPath;
 	
-	public boolean acceptedDeadline = false; 
-	public boolean acceptedNegotiation = false;
 	public boolean successfulProject;
 	
 	//initial bid
@@ -39,7 +37,7 @@ public class Client extends ExtendedAgent
 		super.setup();
 		registerDF();
 		
-		println("Hey! Its me, " + getAID().getName());
+//		println("Hey! Its me, " + getAID().getName());
 		
 		Object[] args = getArguments();
 		
@@ -50,7 +48,7 @@ public class Client extends ExtendedAgent
 			
             deadline = new Bid(this, args[1].toString());
             
-            this.setTolerance(false, 5);
+            this.setTolerance(true);
     		        
     		addBehaviour(new OfferProjectBehaviour());
             
@@ -62,38 +60,27 @@ public class Client extends ExtendedAgent
 	 * 
 	 * int t is for testing purposes if random == false
 	 */
-	protected void setTolerance(boolean random, int t)
+	protected void setTolerance(boolean random)
 	{
-		if(random)
-		{
-			Random r = new Random();
-			int low = 1; //inclusive
-			int high = 101; // exclusive
-			float result = r.nextInt(high-low) + low;
-			this.tolerance = result / 100;
-		}
-		else
-		{
-			this.tolerance = t / 100;
-		}
-		
+		Random r = new Random();
+		int low = 1; //inclusive
+		int high = 101; // exclusive
+		float result = r.nextInt(high-low) + low;
+		this.tolerance = result / 100;
+	
 		this.println("Tolerance: " + this.tolerance);
 	}
 	
 	public boolean checkCPUProposal(Bid bcpu, Bid deadline)
 	{		
-	  if (bcpu.getDeadlineInMilliSeconds() < deadline.getDeadlineInMilliSeconds() + this.getToleranceOfDeadline())
-	  {
-		  return true;
-	  }
-			
-		return false;
+	  return (bcpu.getDeadlineInMilliSeconds() < deadline.getDeadlineInMilliSeconds() + this.getToleranceOfDeadline());
 	}
 	
 	public void initializeClient()
 	{
 		projectFiles = new ArrayList<String>();
 		totalCompilationTime = 0.0;
+		successfulProject = true;
 	}
 	
 	/*

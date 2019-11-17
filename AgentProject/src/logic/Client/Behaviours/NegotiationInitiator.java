@@ -47,7 +47,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 	{
 		Vector<ACLMessage> v = new Vector<ACLMessage>();
 		
-		v.add(createCfpMessage());
+		v.addElement(createCfpMessage());
 		
 		return v;
 	}
@@ -96,51 +96,68 @@ public class NegotiationInitiator extends ContractNetInitiator
 	@Override
 	protected void handleInform(ACLMessage inform)
 	{
+		if (agent.cpus.size() == 0)
+			return;
+		
 		AID cpuName = inform.getSender();
+		int cpuIndex = agent.searchCPU(cpuName);
+		
+		if (cpuIndex == -1)
+			return;
+		
 		CompiledProject cp = CompiledProject.deserialize(inform.getByteSequenceContent());
 		
 		if (cp.errorType == CompiledProjectErrorType.COMPILATIONERROR)
 		{
-			agent.errorPrintln("CPU \"" + cpuName + "\" generated a compilation error!");
+			agent.errorPrintln("CPU \"" + cpuName.getLocalName() + "\" generated a compilation error!");
 			agent.successfulProject = false;
-			agent.doDelete();
+			agent.cpus.remove(agent.searchCPU(cpuName));
 			return;
 		}
 		
-		if (cp.errorType == CompiledProjectErrorType.DEADLINEEXCEEDED)
+		else if (cp.errorType == CompiledProjectErrorType.DEADLINEEXCEEDED)
 		{
-			agent.errorPrintln("CPU \"" + cpuName + "\" exceeded the deadline!");
+			agent.errorPrintln("CPU \"" + cpuName.getLocalName() + "\" exceeded the deadline by " + (cp.totalCompilationTime*1000 - cp.deadline.getDeadlineInMilliSeconds())/(double)1000 + " seconds!");
 			agent.successfulProject = false;
-			agent.doDelete();
+			agent.cpus.remove(agent.searchCPU(cpuName));
 			return;
 		}
-		
-		// Iterate compiledFiles and save the binary on a successful CompiledProject
-		for (int j = 0; j < cp.compiledFiles.size(); j++)
+		else
 		{
-			String filename = cp.compiledFiles.get(j).first;
-			int fileIndex = searchFile(filename);
-			if (fileIndex == -1)
+			// Iterate compiledFiles and save the binary on a successful CompiledProject
+			for (int j = 0; j < cp.compiledFiles.size(); j++)
 			{
-				agent.errorPrintln("Failed to find respective CompilationFile!");
-				continue;
+				String filename = cp.compiledFiles.get(j).first;
+				int fileIndex = searchFile(filename);
+				if (fileIndex == -1)
+				{
+					agent.errorPrintln("Failed to find respective CompilationFile!");
+					continue;
+				}
+				
+				CompilationFile cf = agent.info.files.get(fileIndex);
+				cf.setBinary(cp.compiledFiles.get(j).second);
+				
+				if (!saveBinary(cf))
+				{
+					agent.errorPrintln("Failed to save binary!");
+					continue;
+				}
+				
+				agent.projectFiles.add(cf.path + File.separator + cf.filenameNoExtention + Macros.binaryFileExtension);
 			}
 			
-			CompilationFile cf = agent.info.files.get(fileIndex);
-			cf.setBinary(cp.compiledFiles.get(j).second);
-			
-			if (!saveBinary(cf))
-			{
-				agent.errorPrintln("Failed to save binary!");
-				continue;
-			}
-			
-			agent.projectFiles.add(cf.path + File.separator + cf.filenameNoExtention + Macros.binaryFileExtension);
+			agent.cpus.remove(cpuIndex);
+			agent.println("Successfully received CompiledProject from " + cpuName.getLocalName());
 		}
 		
-		if (agent.projectFiles.size() == agent.info.toBeCompiled.size())
+		if (agent.cpus.size() == 0)
 		{
-			linkProject();
+			if (agent.successfulProject)
+				linkProject();
+			else
+				agent.errorPrintln("Failed to receive the entire project successfully!");
+			
 			agent.doDelete();
 		}
 	}

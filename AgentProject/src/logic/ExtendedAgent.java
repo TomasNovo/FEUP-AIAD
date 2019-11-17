@@ -49,6 +49,19 @@ public class ExtendedAgent extends Agent
 		
 	}
 	
+	@Override
+	public void takeDown()
+	{
+		try
+		{
+			DFService.deregister(this);
+		}
+		catch (FIPAException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public DFAgentDescription[] searchDF(String type)
 	{
 		DFAgentDescription dfad = new DFAgentDescription();
