@@ -188,7 +188,7 @@ public class NegotiationInitiator extends ContractNetInitiator
 		try
 		{
 			String execName = "main";
-			String command = "g++ -m64 -o " + agent.projectPath + File.separator + execName;
+			String command = "g++ -o " + agent.projectPath + File.separator + execName;
 			
 			for (int i = 0; i < agent.projectFiles.size(); i++)
 			{
