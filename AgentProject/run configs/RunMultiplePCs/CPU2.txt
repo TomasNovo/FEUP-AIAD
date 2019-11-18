@@ -1,1 +1,1 @@
--gui -container -host IP CPU2:logic.CPU.CPU()
+-container -host IP CPU2:logic.CPU.CPU()

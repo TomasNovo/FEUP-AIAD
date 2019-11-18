@@ -212,5 +212,4 @@ public class OfferProjectBehaviour extends Behaviour
 	{
 		return true;
 	}
-	
 }

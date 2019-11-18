@@ -63,7 +63,7 @@ public class Client extends ExtendedAgent
 	protected void setTolerance(boolean random)
 	{
 		Random r = new Random();
-		int low = 50; //inclusive
+		int low = 1; //inclusive
 		int high = 101; // exclusive
 		float result = r.nextInt(high-low) + low;
 		this.tolerance = result / 100;
