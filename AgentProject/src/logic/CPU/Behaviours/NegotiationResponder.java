@@ -1,7 +1,10 @@
 package logic.CPU.Behaviours;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
@@ -26,12 +29,21 @@ public class NegotiationResponder extends ContractNetResponder
 	AID clientName;
 	ProjectInfo info;
 	Bid deadline;
+	File data; // Reject,tamanhoProj,nFicheirosProj,tempoCompilaçãoFicheiro,tempoMédioAtraso,\n
 	
 	public NegotiationResponder(CPU agent)
 	{
 		super(agent, MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET));
 		
 		this.agent = agent;
+		
+		data = new File("Info.csv");
+		try {
+			data.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // if file already exists will do nothing 
 	}
 	
 	@Override
@@ -84,6 +96,16 @@ public class NegotiationResponder extends ContractNetResponder
 	protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject)
 	{
 		agent.errorPrintln("Negotiation from \"" + reject.getSender().getLocalName() + "\" is rejected!");
+		
+		try(FileWriter fw = new FileWriter(data.getPath(), true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw))
+			{			
+				out.println("Reject,"+ info.getProjectTotalSize() + "," + info.files.size() + ",0," +"tempoMédioAtraso");
+			    //more code
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			}
 	}
 	
 	
@@ -93,6 +115,15 @@ public class NegotiationResponder extends ContractNetResponder
 		
 		if (agent.compilationTimes.size() > CPU.compilationTimesSize)
 			agent.compilationTimes.remove(0);
+		
+		try(FileWriter fw = new FileWriter(data.getPath(), true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw))
+			{			
+				out.println("Accept," + info.getProjectTotalSize() +"," + info.files.size() +","+ cf.getCompilationTime() +",tempoMédioAtraso");
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			}
 	}
 	
 	
