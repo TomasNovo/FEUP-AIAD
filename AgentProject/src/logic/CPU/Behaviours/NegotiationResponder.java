@@ -80,7 +80,8 @@ public class NegotiationResponder extends ContractNetResponder
             		agent.errorPrintln("Failed to compile " + cf.getFilename());        			
         		}
             	
-        		saveCompilationTime(cf);       		
+        		saveCompilationTime(cf);       	
+        		writeAcceptToCSV(cf, cp);
         		cp.addCompiledFile(cf);
         	}
 		}
@@ -93,19 +94,39 @@ public class NegotiationResponder extends ContractNetResponder
 		return createCompiledProjectResponse(cp);
 	}
 	
-	protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject)
+	protected void writeAcceptToCSV(CompilationFile cf, CompiledProject cp)
 	{
-		agent.errorPrintln("Negotiation from \"" + reject.getSender().getLocalName() + "\" is rejected!");
+		double time = cp.deadline.getDeadlineInMilliSeconds() - cp.totalCompilationTime;
 		
+		try(FileWriter fw = new FileWriter(data.getPath(), true);
+		    BufferedWriter bw = new BufferedWriter(fw);
+		    PrintWriter out = new PrintWriter(bw))
+		{	
+			
+			out.println("Accept," + info.getProjectTotalSize() +"," + info.files.size() +","+ cf.getCompilationTime() +"," + time );
+		} catch (IOException e) {
+			agent.errorPrintln("Error writing Accept on .cvs");
+		    //exception handling left as an exercise for the reader
+		}
+	}
+	
+	protected void writeRejectToCSV()
+	{
 		try(FileWriter fw = new FileWriter(data.getPath(), true);
 			    BufferedWriter bw = new BufferedWriter(fw);
 			    PrintWriter out = new PrintWriter(bw))
 			{			
-				out.println("Reject,"+ info.getProjectTotalSize() + "," + info.files.size() + ",0," +"tempoMédioAtraso");
+				out.println("Reject,"+ info.getProjectTotalSize() + "," + info.files.size() + ",0," + "0");
 			    //more code
 			} catch (IOException e) {
 			    //exception handling left as an exercise for the reader
 			}
+	}
+	
+	protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject)
+	{
+		agent.errorPrintln("Negotiation from \"" + reject.getSender().getLocalName() + "\" is rejected!");
+		writeRejectToCSV();
 	}
 	
 	
@@ -115,15 +136,6 @@ public class NegotiationResponder extends ContractNetResponder
 		
 		if (agent.compilationTimes.size() > CPU.compilationTimesSize)
 			agent.compilationTimes.remove(0);
-		
-		try(FileWriter fw = new FileWriter(data.getPath(), true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{			
-				out.println("Accept," + info.getProjectTotalSize() +"," + info.files.size() +","+ cf.getCompilationTime() +",tempoMédioAtraso");
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
 	}
 	
 	
