@@ -1,0 +1,42 @@
+Amarc
+5
+UB ; 10
+US ; 20
+CH ; 10
+RC ; 45
+MultiBikes
+4
+UB ; 0
+US ; 0
+CH ; 0
+RC ; 60
+Costco
+4
+UB ; 5
+US ; 30
+CH ; 10
+RC ; 45
+AllBikes
+3
+UB ; 3
+US ; 43
+CH ; 0
+RC ; 0
+NBikes
+3
+UB ; 10
+US ; 15
+CH ; 0
+RC ; 20
+IncB
+2
+UB ; 13
+US ; 0
+CH ; 0
+RC ; 20
+HB
+1
+UB ; 0
+US ; 30
+CH ; 10
+RC ; 45

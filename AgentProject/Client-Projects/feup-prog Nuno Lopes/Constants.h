@@ -1,0 +1,13 @@
+#pragma once
+
+
+//THIS HEADER INCLUDES ALL THE GLOBAL CONSTANTS FOR EASIER MODIFICATION, IF NEEDED
+
+
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+const int MINUTO_INICIAL = 480;	//8h
+const int MINUTO_FINAL = 1380;	//23h
+
+#endif 

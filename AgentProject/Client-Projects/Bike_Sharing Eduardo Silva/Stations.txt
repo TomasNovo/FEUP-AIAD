@@ -1,0 +1,20 @@
+CMV
+15 , 15
+15
+CH , CH , UB , US , RC , RC , RC , RC , RC , UB ;
+Trindade
+4 , 5
+20
+CH , RC , RC , US , CH , RC , US , US , US ;
+CEPSA
+5 , 10
+15
+UB , US , CH , CH , CH , RC , RC ;
+Sao Joao
+1 , 1
+20
+US , US , US , US , US , US , US , UB ;
+Sao Bento
+9 , 10
+15
+UB , US , UB , UB , RC , US , UB , UB , RC , RC , UB ;

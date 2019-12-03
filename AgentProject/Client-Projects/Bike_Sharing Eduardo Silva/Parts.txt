@@ -1,0 +1,6 @@
+Corrente ; ChinaChains ; 6
+Corrente ; 2ChainzInc ; 12
+assento ; SeatleSeats ; 20
+guiador ; AEParts ; 5
+guiador ; SinclairParts ; 12
+pedal ; CRParts ; 3
