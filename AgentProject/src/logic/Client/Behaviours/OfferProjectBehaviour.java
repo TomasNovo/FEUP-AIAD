@@ -74,7 +74,7 @@ public class OfferProjectBehaviour extends Behaviour
             }
             
             // Assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp)
-            distributeFilesRandomly();
+            distributeFilesEvenlyBySize();
             
     		for (int i = 0; i < infos.size(); i++)
     		{
@@ -105,8 +105,8 @@ public class OfferProjectBehaviour extends Behaviour
 	
 	private Bid calculateDeadline(ProjectInfo info)
 	{
-		int projectNumBytes = agent.info.calculateCompileNumBytes();
-		int proposalNumBytes = info.calculateCompileNumBytes();
+		int projectNumBytes = agent.info.calculateToBeCompiledSize();
+		int proposalNumBytes = info.calculateToBeCompiledSize();
 		int estimatedCompilationTime = (int)((double)agent.deadline.getDeadlineInMilliSeconds() / (double)projectNumBytes * (double)proposalNumBytes);
 		
 		return new Bid(estimatedCompilationTime + "ms");

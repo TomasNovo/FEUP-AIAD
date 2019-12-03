@@ -37,19 +37,7 @@ public class ProjectInfo implements java.io.Serializable
 		this.files = files;
 	}
 	
-	public int getProjectTotalSize()
-	{
-		int totalSize = 0;
-		
-		for(int i = 0; i < files.size(); i++)
-		{
-			totalSize += files.get(i).size;
-		}
-		
-		return totalSize;
-	}
-	
-	public int calculateCompileNumBytes()
+	public int calculateToBeCompiledSize()
 	{
 		int sumBytes = 0;
 		

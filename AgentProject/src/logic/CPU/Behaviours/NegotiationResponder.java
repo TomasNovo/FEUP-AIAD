@@ -81,10 +81,11 @@ public class NegotiationResponder extends ContractNetResponder
         		}
             	
         		saveCompilationTime(cf);       	
-        		writeAcceptToCSV(cf, cp);
-        		cp.addCompiledFile(cf);
+        		cp.addCompiledFile(cf);        		
         	}
 		}
+        
+		writeAcceptToCSV(cp);        
         
         if (failed)
         	agent.errorPrintln("Failed to compile project \"" + info.name + "\"!");
@@ -94,16 +95,16 @@ public class NegotiationResponder extends ContractNetResponder
 		return createCompiledProjectResponse(cp);
 	}
 	
-	protected void writeAcceptToCSV(CompilationFile cf, CompiledProject cp)
+	protected void writeAcceptToCSV(CompiledProject cp)
 	{
-		double time = cp.deadline.getDeadlineInMilliSeconds() - cp.totalCompilationTime;
+		double time = (cp.totalCompilationTime*1000.0 - cp.deadline.getDeadlineInMilliSeconds())/1000.0;
 		
 		try(FileWriter fw = new FileWriter(data.getPath(), true);
 		    BufferedWriter bw = new BufferedWriter(fw);
 		    PrintWriter out = new PrintWriter(bw))
 		{	
 			
-			out.println("Accept," + info.getProjectTotalSize() +"," + info.files.size() +","+ cf.getCompilationTime() +"," + time );
+			out.println("Accept," + info.calculateToBeCompiledSize() +"," + info.toBeCompiled.size() +"," + time );
 		} catch (IOException e) {
 			agent.errorPrintln("Error writing Accept on .cvs");
 		    //exception handling left as an exercise for the reader
@@ -116,7 +117,7 @@ public class NegotiationResponder extends ContractNetResponder
 			    BufferedWriter bw = new BufferedWriter(fw);
 			    PrintWriter out = new PrintWriter(bw))
 			{			
-				out.println("Reject,"+ info.getProjectTotalSize() + "," + info.files.size() + ",0," + "0");
+				out.println("Reject,"+ info.calculateToBeCompiledSize() + "," + info.toBeCompiled.size() + ",0," + "0");
 			    //more code
 			} catch (IOException e) {
 			    //exception handling left as an exercise for the reader
@@ -217,7 +218,7 @@ public class NegotiationResponder extends ContractNetResponder
 		double average = agent.getAverageCPUCompilationTimes();
 		
 		int deadline = info.deadline.getDeadlineInMilliSeconds();
-		int numBytes = info.calculateCompileNumBytes();
+		int numBytes = info.calculateToBeCompiledSize();
 		double predictedCompilationTime = numBytes/average * 1000;
 		
 		if (average == 0.0 || predictedCompilationTime <= deadline)
