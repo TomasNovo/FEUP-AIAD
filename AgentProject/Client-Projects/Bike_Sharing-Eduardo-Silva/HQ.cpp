@@ -940,7 +940,7 @@ void HQ::buy_part_func()
 	string part_supplier;
 	double part_price;
 	bool removed = false;
-	cin.ignore(1, '/n');
+	cin.ignore(1, "/n");
 	int counter = 0;
 
 

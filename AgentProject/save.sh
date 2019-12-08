@@ -1,0 +1,1 @@
+java -cp jade/lib/jade.jar jade.Boot -gui CPU":src.logic.CPU.CPU();"

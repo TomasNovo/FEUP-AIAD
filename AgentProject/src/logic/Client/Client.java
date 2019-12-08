@@ -37,6 +37,15 @@ public class Client extends ExtendedAgent
 		super.setup();
 		registerDF();
 		
+		int sleepTime = (int)(Math.random()*10000.0);
+		
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 //		println("Hey! Its me, " + getAID().getName());
 		
 		Object[] args = getArguments();

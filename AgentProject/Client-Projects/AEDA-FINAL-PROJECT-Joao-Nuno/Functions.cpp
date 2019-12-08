@@ -24,7 +24,7 @@
 #include <list>
 #include <algorithm>
 #include <iomanip>
-
+#include <Windows.h>
 using namespace std;
 
 //PROTOTYPE
@@ -612,7 +612,7 @@ void adicionarAssociado() {
 					<< endl;
 		if (selected >= areas.size() || selected < 0) { //SE UM DOS INDICES ESCOLHIDOS NAO CORRESPONDE A NENHUM DOS APRESENTADOS
 			cout << "\nNao existe a opcao " << selected << endl;
-			sleep(1);
+			
 			return;
 		}
 
@@ -627,7 +627,7 @@ void adicionarAssociado() {
 
 	cout << "\nAssociado adicionado com sucesso!" << endl << endl;
 
-	sleep(1);
+	
 }
 
 void removerAssociado() {
@@ -655,13 +655,13 @@ void removerAssociado() {
 		Associacao->removeAssociate(uniqueID);
 	} catch (NoSuchID & e) {
 		cout << "\nNao existe nenhum associado com o ID: " << e.getID() << endl;
-		sleep(1);
+		
 		return;
 	}
 
 	cout << "\nAssociado removido com sucesso!" << endl;
 
-	sleep(1);
+	
 }
 
 void alterarAssociado() {
@@ -689,7 +689,7 @@ void alterarAssociado() {
 		alterar = Associacao->getAssoById(uniqueID);
 	} catch (const NoSuchID & e) {
 		cout << "\nNao existe nenhum associado com o ID: " << e.getID() << endl;
-		sleep(1);
+		
 		return;
 	}
 
@@ -733,7 +733,7 @@ void alterarAssociado() {
 						<< endl;
 			if (selected >= areas.size() || selected < 0) { //SE UM DOS INDICES ESCOLHIDOS NAO CORRESPONDE A NENHUM DOS APRESENTADOS
 				cout << "\nNao existe a opcao " << selected << endl;
-				sleep(1);
+				
 				return;
 			}
 
@@ -1078,7 +1078,7 @@ void criarEvento() {
 		} catch (NoSuchID & e) {
 			cout << "\nNao existe nenhum associado com o ID: " << e.getID()
 					<< endl;
-			sleep(1);
+			
 			return;
 		}
 		event_request.push_back(associado);
@@ -1097,7 +1097,7 @@ void criarEvento() {
 		} catch (NoSuchID & e) {
 			cout << "\nNao existe nenhum associado com o ID: " << e.getID()
 					<< endl;
-			sleep(1);
+			
 			return;
 		}
 		event_organizers.push_back(associado);
@@ -1145,7 +1145,7 @@ void criarEvento() {
 		} catch (const InvalidRequest & e) {
 			cout << "\nEm " << e.getTotal() << " associados, " << e.getLate()
 					<< " tem pagamentos em atraso. Impossivel criar evento!\n\n";
-			sleep(1);
+			
 			return;
 		}
 
@@ -1164,7 +1164,7 @@ void criarEvento() {
 		} catch (const InvalidRequest & e) {
 			cout << "\nEm " << e.getTotal() << " associados, " << e.getLate()
 					<< " tem pagamentos em atraso. Impossivel criar evento!\n\n";
-			sleep(1);
+			
 			return;
 		}
 
@@ -1173,7 +1173,7 @@ void criarEvento() {
 	}
 
 	cout << "\nPedido de Evento criado com sucesso!\n";
-	sleep(1);
+	
 }
 
 void removerEvento() {
@@ -1211,12 +1211,12 @@ void removerEvento() {
 		Associacao->removeEvent(data, fase);
 	} catch (const NoSuchDate & e) {
 		cout << "\nNao existe nenhum evento com a data " << e.getDate() << endl;
-		sleep(1);
+		
 		return;
 	}
 
 	cout << "\nEvento removido com sucesso!\n";
-	sleep(1);
+	
 }
 
 void alterarEvento() {
@@ -1256,7 +1256,7 @@ void alterarEvento() {
 		alterar = Associacao->getEventByDatePhase(data, fase);
 	} catch (const NoSuchDate & e) {
 		cout << "\nNao existe nenhum evento com a data " << e.getDate() << endl;
-		sleep(1);
+		
 		return;
 	}
 
@@ -1411,7 +1411,7 @@ void verInfoEvento() {
 				} catch (const NoSuchDate & e) {
 					cout << "\nNao existe nenhum evento com a data "
 							<< e.getDate() << endl;
-					sleep(1);
+					
 					return;
 				}
 
@@ -1640,7 +1640,7 @@ void pagarCotas() {
 		associado = Associacao->getAssoById(uniqueID);
 	} catch (const NoSuchID & e) {
 		cout << "\nNao existe nenhum associado com o ID: " << e.getID() << endl;
-		sleep(1);
+		
 		return;
 	}
 
@@ -1742,7 +1742,7 @@ void divulgarEmail() {
 		associate = Associacao->getAssoById(uniqueID);
 	} catch (NoSuchID & e) {
 		cout << "\nNao existe nenhum associado com o ID: " << e.getID() << endl;
-		sleep(1);
+		
 		return;
 	}
 
@@ -1774,7 +1774,7 @@ void divulgarEmail() {
 	Rede->addMail(newMail);
 
 	cout << "\nMail enviado com sucesso!\n";
-	sleep(1);
+	
 	return;
 
 }
@@ -1804,7 +1804,7 @@ void verEmails() {
 		associate = Associacao->getAssoById(uniqueID);
 	} catch (NoSuchID & e) {
 		cout << "\nNao existe nenhum associado com o ID: " << e.getID() << endl;
-		sleep(1);
+		
 		return;
 	}
 

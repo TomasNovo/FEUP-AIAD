@@ -1,6 +1,5 @@
 package logic;
-
-import logic.Client.Client;
+import logic.ExtendedAgent;
 
 public class Bid implements java.io.Serializable  
 {

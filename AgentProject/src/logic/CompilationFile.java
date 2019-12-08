@@ -74,7 +74,7 @@ public class CompilationFile implements java.io.Serializable
 		{
 			String binaryPath = path + File.separator + filenameNoExtention + Macros.binaryFileExtension;
 			String codePath = path + File.separator + filenameNoExtention + Macros.codeFileExtension;
-			String command = "g++ -c -o " + "\"" + binaryPath + "\" " + "\"" + codePath + "\"";
+			String command = "g++ -std=c++11 -c -o " + "\"" + binaryPath + "\" " + "\"" + codePath + "\"";
 			
 			long start = System.nanoTime();
 			process = Runtime.getRuntime().exec(command);
