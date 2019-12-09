@@ -110,6 +110,7 @@ public class NegotiationResponder extends ContractNetResponder
 			
 			line += info.calculateToBeCompiledSize() + ",";
 			line += info.toBeCompiled.size() + ",";
+			line += agent.getAverageCPUCompilationTimes() + ",";
 			line += info.deadline.getDeadlineInMilliSeconds()/1000.0 + ",";
 
 			if (cp != null)
