@@ -1,4 +1,5 @@
 #include "Header.h"
+#include <bits/stdc++.h>
 
 void menu(Company &c);
 

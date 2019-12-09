@@ -1,6 +1,7 @@
 #include "Company.h"
 #include <algorithm>
 #include <fstream>
+#include <bits/stdc++.h> 
 
 string organizarString(string s);
 void end(Company &c);
