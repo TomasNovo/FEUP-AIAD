@@ -39,7 +39,7 @@ public class CPU extends ExtendedAgent
 	
 	public boolean acceptableDeadline = false;
 	
-	public static final int compilationTimesSize = 15;
+	public static final int compilationTimesSize = 30;
 	
 	@Override
 	protected void setup()
@@ -56,6 +56,14 @@ public class CPU extends ExtendedAgent
 		new File("CPU-Projects").mkdirs();
 		
 		addBehaviour(new NegotiationResponder(this));
+	}
+	
+	public void saveCompilationTime(CompilationFile cf)
+	{
+		compilationTimes.add(new Pair<Double, Integer>(cf.getCompilationTime(), new Integer(cf.text.length())));
+		
+		if (compilationTimes.size() > compilationTimesSize)
+			compilationTimes.remove(0);
 	}
 	
 	// Returns average compilation times if exist

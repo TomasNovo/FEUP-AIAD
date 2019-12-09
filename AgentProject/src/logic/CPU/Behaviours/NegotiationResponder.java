@@ -80,12 +80,12 @@ public class NegotiationResponder extends ContractNetResponder
             		agent.errorPrintln("Failed to compile " + cf.getFilename());        			
         		}
             	
-        		saveCompilationTime(cf);       	
+        		agent.saveCompilationTime(cf);       	
         		cp.addCompiledFile(cf);        		
         	}
 		}
         
-		writeAcceptToCSV(cp);        
+        writeToCSV(cp);
         
         if (failed)
         	agent.errorPrintln("Failed to compile project \"" + info.name + "\"!");
@@ -95,48 +95,41 @@ public class NegotiationResponder extends ContractNetResponder
 		return createCompiledProjectResponse(cp);
 	}
 	
-	protected void writeAcceptToCSV(CompiledProject cp)
-	{
-		double time = (cp.totalCompilationTime*1000.0 - cp.deadline.getDeadlineInMilliSeconds())/1000.0;
-		
+	protected void writeToCSV(CompiledProject cp)
+	{		
 		try(FileWriter fw = new FileWriter(data.getPath(), true);
 		    BufferedWriter bw = new BufferedWriter(fw);
 		    PrintWriter out = new PrintWriter(bw))
 		{	
+			String line = "";
 			
-			out.println("Accept," + info.calculateToBeCompiledSize() +"," + info.toBeCompiled.size() +"," + time );
+			if (cp != null)
+				line += "Accept,";
+			else
+				line += "Reject,";
+			
+			line += info.calculateToBeCompiledSize() + ",";
+			line += info.toBeCompiled.size() + ",";
+			line += info.deadline.getDeadlineInMilliSeconds()/1000.0 + ",";
+
+			if (cp != null)
+				line += cp.totalCompilationTime + ",";
+			else
+				line += "0,";
+			
+			out.println(line);
 		} catch (IOException e) {
 			agent.errorPrintln("Error writing Accept on .cvs");
 		    //exception handling left as an exercise for the reader
 		}
 	}
 	
-	protected void writeRejectToCSV()
-	{
-		try(FileWriter fw = new FileWriter(data.getPath(), true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{			
-				out.println("Reject,"+ info.calculateToBeCompiledSize() + "," + info.toBeCompiled.size() + ",0," + "0");
-			    //more code
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
-	}
+
 	
 	protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject)
 	{
 		agent.errorPrintln("Negotiation from \"" + reject.getSender().getLocalName() + "\" is rejected!");
-		writeRejectToCSV();
-	}
-	
-	
-	public void saveCompilationTime(CompilationFile cf)
-	{
-		agent.compilationTimes.add(new Pair<Double, Integer>(cf.getCompilationTime(), new Integer(cf.text.length())));
-		
-		if (agent.compilationTimes.size() > CPU.compilationTimesSize)
-			agent.compilationTimes.remove(0);
+		writeToCSV(null);
 	}
 	
 	
