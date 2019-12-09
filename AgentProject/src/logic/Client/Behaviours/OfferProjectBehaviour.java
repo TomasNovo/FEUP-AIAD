@@ -74,9 +74,9 @@ public class OfferProjectBehaviour extends Behaviour
             }
             
             // Assign code CompilationFiles to CPUs. Only the CompilationFiles in agent.files are to be compiled (.cpp)
-//            distributeFilesEvenlyBySize();
+            distributeFilesEvenlyBySize();
 //            distributeFilesRandomly();
-            distributeFilesRandomlyBalanced();
+//            distributeFilesRandomlyBalanced();
             
     		for (int i = 0; i < infos.size(); i++)
     		{
