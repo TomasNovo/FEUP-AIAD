@@ -1,0 +1,6 @@
+2 problemas: classificação(aceitar ou não) e regressão linear(minimizar tempo estimado)
+
+ex regressão linear (só guardar accepts): 
+client: proposta_0
+cpu: tempoEstimado_0
+se tempoEstimado_0 > prop_0 entÃo (tempoEstimado_0 - prop_0 ) / prop_0
