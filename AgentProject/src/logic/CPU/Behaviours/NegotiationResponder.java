@@ -28,8 +28,12 @@ public class NegotiationResponder extends ContractNetResponder
 	CPU agent;
 	AID clientName;
 	ProjectInfo info;
-	Bid deadline;
-	File data; // Reject,tamanhoProj,nFicheirosProj,tempoCompilaçãoFicheiro,tempoMédioAtraso,\n
+	File data; 
+	double estimatedDeadline = 0;
+	double proposedDeadline = 0;
+	boolean acceptableDeadline;
+	
+	//Decision,ProjSize,TotalFilesProj,AverageBytes/s,Deadline,CompilationTime, ProposedDeadline - Deadline / Proposed Deadline
 	
 	public NegotiationResponder(CPU agent)
 	{
@@ -37,7 +41,7 @@ public class NegotiationResponder extends ContractNetResponder
 		
 		this.agent = agent;
 		
-		data = new File("Info.csv");
+		data = new File("InfoClassification.csv");
 		try {
 			data.createNewFile();
 		} catch (IOException e) {
@@ -97,6 +101,12 @@ public class NegotiationResponder extends ContractNetResponder
 	
 	protected void writeToCSV(CompiledProject cp)
 	{		
+		
+		this.agent.println("RECEIVVVVVVED: " + this.estimatedDeadline);
+		this.agent.println("CALUCLATED: " + this.proposedDeadline);
+		double result = (this.estimatedDeadline > this.proposedDeadline) ? (this.estimatedDeadline - this.proposedDeadline) / this.proposedDeadline : 0.0;
+		this.agent.println("RESULT: " + result);
+		
 		try(FileWriter fw = new FileWriter(data.getPath(), true);
 		    BufferedWriter bw = new BufferedWriter(fw);
 		    PrintWriter out = new PrintWriter(bw))
@@ -112,11 +122,20 @@ public class NegotiationResponder extends ContractNetResponder
 			line += info.toBeCompiled.size() + ",";
 			line += agent.getAverageCPUCompilationTimes() + ",";
 			line += info.deadline.getDeadlineInMilliSeconds()/1000.0 + ",";
-
+			
 			if (cp != null)
 				line += cp.totalCompilationTime + ",";
 			else
 				line += "0,";
+			
+//			this.agent.println("RECEIVVVVVVED: " + this.receivedDeadline);
+//			this.agent.println("PROPPPPPPPPPPPP: " + this.proposedDeadline);
+			
+//			if (cp != null)
+				line += result;
+//			else
+//				line += this.proposedDeadline;
+			
 			
 			out.println(line);
 		} catch (IOException e) {
@@ -218,7 +237,8 @@ public class NegotiationResponder extends ContractNetResponder
 		if (average == 0.0 || predictedCompilationTime <= deadline)
 		{
 			// ACCEPT
-			agent.acceptableDeadline = true;
+			acceptableDeadline = true;
+			this.proposedDeadline = deadline/1000.0;
 			return Macros.deadlineAcceptable;
 		}
 		else
@@ -228,6 +248,10 @@ public class NegotiationResponder extends ContractNetResponder
 			int newDeadLine = (int)((Math.random()-0.05) * variance * 2 * predictedCompilationTime + predictedCompilationTime);			
 			info.deadline = new Bid(new Integer(newDeadLine).toString() + "ms");
 			agent.println("Received deadline: " + deadline + " ms, proposing " + newDeadLine + "ms");
+
+			this.proposedDeadline = deadline/1000.0;
+			this.estimatedDeadline = predictedCompilationTime/1000.0;
+			
 			return new Integer(newDeadLine).toString() + "ms";
 		}
 	}
