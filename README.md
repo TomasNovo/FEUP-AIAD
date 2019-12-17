@@ -17,7 +17,7 @@ The objective of this project was to decrease the total compilation of the files
 
 
 More info of this project can found 
-[here](../blob/master/docs).
+[here](https://raw.githubusercontent.com/TomasNovo/FEUP-AIAD/master/docs/Relatorio-Proj1).
 
 
 ## 2. Project 2 - Rapidminer
@@ -28,4 +28,4 @@ The *classification* problem was the decision of the Client. We gave to Rapidmin
 
 In the *linear regression* problem we used the time difference between the predicted compilation time given by the CPU and the deadline of the project.
 
-More info of this project can found [here](../blob/master/docs).
+More info of this project can found [here](https://raw.githubusercontent.com/TomasNovo/FEUP-AIAD/master/docs/Relatorio-Proj2).
